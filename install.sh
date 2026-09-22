@@ -15,7 +15,7 @@ trap cleanup EXIT
 
 # Unduh repositori sementara jika dijalankan via pipe/curl
 if [ -z "$SCRIPT_DIR" ] || [ ! -d "$SCRIPT_DIR/adapters" ]; then
-  REPO_URL="${CODE_CONVENTION_REPO:-https://github.com/YOUR_ORGANIZATION_OR_USERNAME/code_convention.git}"
+  REPO_URL="${CODE_CONVENTION_REPO:-https://github.com/okta4294/code_convention_skill.git}"
   TEMP_DIR="$(mktemp -d 2>/dev/null || mktemp -d -t 'code_conv')"
   git clone --depth 1 "$REPO_URL" "$TEMP_DIR" 2>/dev/null || {
     echo "Error: Gagal mengunduh repositori. Pastikan git terpasang atau tentukan CODE_CONVENTION_REPO."

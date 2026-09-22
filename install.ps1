@@ -37,7 +37,7 @@ $CleanupNeeded = $false
 
 try {
     if (-not $ScriptDir -or -not (Test-Path (Join-Path $ScriptDir "adapters"))) {
-        $RepoUrl = if ($env:CODE_CONVENTION_REPO) { $env:CODE_CONVENTION_REPO } else { "https://github.com/YOUR_ORGANIZATION_OR_USERNAME/code_convention.git" }
+        $RepoUrl = if ($env:CODE_CONVENTION_REPO) { $env:CODE_CONVENTION_REPO } else { "https://github.com/okta4294/code_convention_skill.git" }
         Write-Host "Mengunduh konfigurasi dari repositori..."
         $TempDir = Join-Path $env:TEMP ("code_conv_" + [System.Guid]::NewGuid().ToString("N"))
         New-Item -ItemType Directory -Path $TempDir -Force | Out-Null
@@ -60,8 +60,9 @@ try {
     }
 
     $UserHome = [Environment]::GetFolderPath("UserProfile")
+    $IsGlobal = $Global.IsPresent -or ($args -contains "-Global") -or ($args -contains "--global") -or ($args -contains "-g") -or ($env:GLOBAL -eq "1") -or ($env:GLOBAL -eq "true")
 
-    if ($Global) {
+    if ($IsGlobal) {
         Write-Host "Memasang aturan secara global..."
 
         # 1. Antigravity / Gemini CLI Global Skills & Rules

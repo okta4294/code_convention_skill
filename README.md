@@ -22,48 +22,48 @@ Untuk menjaga stabilitas repositori dan kepemilikan kode oleh developer (*Develo
 
 ## Panduan Instalasi Cepat
 
-### Opsi 1: Pasang Secara Global (Otomatis Aktif di Semua Proyek)
-Konfigurasi akan disalin ke direktori pengguna:
-- **Antigravity:** `~/.gemini/config/skills/` & `~/.gemini/config/rules/`
-- **Claude Code:** `~/.claude/CLAUDE.md`
-- **OpenCode:** `~/.config/opencode/AGENTS.md` & `~/.config/opencode/commands/`
+### 1. Instalasi Instan
 
-**Linux / macOS / Git Bash:**
-```bash
-./install.sh --global
-```
+Cukup jalankan satu baris perintah berikut di terminal:
 
-**Windows PowerShell:**
-```powershell
-.\install.ps1 -Global
-```
+#### Pemasangan Global (Aktif di Semua Proyek Pengguna)
+Otomatis memasang aturan ke Antigravity (`~/.gemini/config/`), Claude Code (`~/.claude/`), dan OpenCode (`~/.config/opencode/`):
 
----
+- **Linux / macOS / Git Bash:**
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/okta4294/code_convention_skill/main/install.sh | bash -s -- --global
+  ```
+- **Windows PowerShell:**
+  ```powershell
+  & ([scriptblock]::Create((irm https://raw.githubusercontent.com/okta4294/code_convention_skill/main/install.ps1))) -Global
+  ```
 
-### Opsi 2: Pasang ke Proyek Tertentu (Lokal)
-Menyalin seluruh berkas adapter dan perintah ke direktori proyek target (`.cursorrules`, `.windsurfrules`, `CLAUDE.md`, `AGENTS.md`, `.opencode/commands/`, dan `.agents/skills/`).
+#### Pemasangan Lokal (Hanya untuk Proyek Saat Ini)
+Jalankan langsung di dalam folder proyek target Anda:
 
-**Linux / macOS / Git Bash:**
-```bash
-# Untuk proyek saat ini
-./install.sh
-
-# Atau arahkan ke direktori proyek target
-./install.sh /path/ke/proyek-anda
-```
-
-**Windows PowerShell:**
-```powershell
-# Untuk proyek saat ini
-.\install.ps1
-
-# Atau arahkan ke direktori proyek target
-.\install.ps1 -TargetDir "D:\proyek\aplikasi-saya"
-```
+- **Linux / macOS / Git Bash:**
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/okta4294/code_convention_skill/main/install.sh | bash
+  ```
+- **Windows PowerShell:**
+  ```powershell
+  irm https://raw.githubusercontent.com/okta4294/code_convention_skill/main/install.ps1 | iex
+  ```
 
 ---
 
-### Opsi 3: Web Chat / Custom GPT (OpenAI & Antigravity)
+### 2. Instalasi dari Repositori Lokal (Jika Sudah di-Clone)
+
+- **Mode Global:**
+  - Bash: `./install.sh --global`
+  - PowerShell: `.\install.ps1 -Global`
+- **Mode Lokal:**
+  - Bash: `./install.sh` atau `./install.sh /path/ke/proyek-anda`
+  - PowerShell: `.\install.ps1` atau `.\install.ps1 -TargetDir "D:\proyek\aplikasi-anda"`
+
+---
+
+### 3. Web Chat / Custom GPT (OpenAI & Antigravity)
 Salin seluruh teks yang ada di dalam berkas [adapters/custom-gpt-instructions.txt](file:///adapters/custom-gpt-instructions.txt) lalu tempel ke menu **Custom Instructions** atau **System Prompt**.
 
 ---
