@@ -7,13 +7,13 @@ STANDAR TEKNIS YANG WAJIB DITEGAKKAN:
 ==================================================
 
 1. PEMROGRAMAN AMAN (SECURITY):
-- SQL Injection: Dilarang menggabungkan variabel langsung ke dalam raw query. Wajib menggunakan Parameterized Query / Prepared Statements (mysqli/PDO) atau Query Builder framework. Jika arsitektur aplikasi belum memungkinkan PDO/mysqli, AI wajib menyarankan mitigasi alternatif: (1) escaping bawaan database/addslashes, (2) strict type casting numerik (int)$id, (3) whitelist array validation in_array() untuk klausa dinamis, (4) format validation (filter_var/regex), dan (5) konfirmasi opsi developer.
-- XSS Prevention: Variabel dari $_GET yang dicetak ke HTML wajib disanitasi dengan fungsi htmlentities().
+- SQL Injection: Dilarang menggabungkan variabel langsung ke dalam raw query. Wajib menggunakan Parameterized Query / Prepared Statements / ORM resmi (contoh: PDO/MySQLi, Node.js/Prisma/pg, SQLAlchemy, PreparedStatement). Jika arsitektur aplikasi belum memungkinkan parameterized query, AI wajib menyarankan mitigasi alternatif: (1) escaping bawaan driver basis data, (2) strict type casting numerik (misal int/parseInt), (3) whitelist array/set validation untuk klausa dinamis seperti ORDER BY, (4) format validation (filter/regex), dan (5) konfirmasi opsi developer.
+- XSS Prevention: Parameter input pengguna (misal URL query params) yang dicetak ke HTML wajib disanitasi dengan fungsi encoding/escaping HTML kontekstual (misal htmlentities(), auto-escaping template engine).
 - File Download: Wajib berbasis ID dokumen yang terdaftar disertai pengecekan hak akses (otorisasi/role). Dilarang mengekspos path berkas langsung atau parameter nama file di URL.
-- File Upload: Nama berkas wajib diubah menjadi hash unik dan divalidasi dengan whitelist ekstensi yang diizinkan.
+- File Upload: Nama berkas wajib diubah menjadi hash unik dan divalidasi dengan whitelist ekstensi serta MIME type yang diizinkan.
 
 2. INTEGRITAS & VALIDASI (INTEGRITY):
-- Transaksi Database: Setiap proses insert/update/delete di sisi back end wajib dibungkus blok transaksi (Commit & Rollback).
+- Transaksi Database: Setiap proses penulisan data di sisi back end (insert/update/delete) wajib dibungkus blok transaksi dengan penanganan rollback saat error (contoh: PDO/Laravel/CI, Prisma, @Transactional, db.Begin).
 - Foreign Key: Wajib mendefinisikan Foreign Key untuk setiap relasi tabel sejak fase ERD.
 - Validasi Berlapis: Validasi Back End wajib ada dan diutamakan sebelum Front End (mengantisipasi jika JavaScript dinonaktifkan).
 

@@ -14,8 +14,13 @@ Melakukan audit terhadap integritas data, ketahanan proses transaksi basis data,
 
 ## Aturan Kepatuhan Khusus
 1. Database Transactions (Commit & Rollback):
-   - Setiap operasi penulisan basis data di back end (insert, update, delete) wajib dibungkus blok transaksi.
-   - Menggunakan mekanisme `trans_start()`, `trans_commit()`, dan `trans_rollback()` (atau blok `beginTransaction`, `commit`, `rollBack` pada PDO).
+   - Setiap operasi penulisan basis data di back end (insert, update, delete) yang melibatkan multi-langkah atau integritas data wajib dibungkus blok transaksi dengan mekanisme rollback saat error.
+   - Contoh implementasi transaksi per stack/framework:
+     * PHP: PDO `beginTransaction()` / `commit()` / `rollBack()`, CodeIgniter `trans_start()` / `trans_complete()`, Laravel `DB::transaction()`.
+     * Node.js / TypeScript: Prisma `$transaction()`, Knex `transaction()`, TypeORM `QueryRunner`, driver `pg` / `mysql2`.
+     * Python: Django `transaction.atomic()`, SQLAlchemy session transactions.
+     * Java: Spring `@Transactional`, JDBC `setAutoCommit(false)` / `commit()` / `rollback()`.
+     * Go / C# .NET: `db.Begin()` / `tx.Commit()` / `tx.Rollback()`, Entity Framework `Database.BeginTransaction()`.
 2. Relasi Tabel & Foreign Key:
    - Relasi antar tabel yang berhubungan wajib menggunakan Foreign Key sejak pembuatan skema/ERD.
    - Penamaan constraint Foreign Key harus mematuhi konvensi (`fk_<singkatan_tabel>_<nama_kolom>`).

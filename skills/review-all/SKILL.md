@@ -15,12 +15,12 @@ Menjalankan audit menyeluruh terhadap kode, skema basis data, atau berkas konfig
 
 ## Daftar Periksa Audit
 1. Keamanan (Security):
-   - Penggunaan Parameterized Query / Prepared Statements (mysqli/PDO/Query Builder) untuk query database (atau mitigasi alternatif: escaping, strict type casting integer, whitelist validation jika non-PDO/mysqli).
-   - Sanitasi parameter GET menggunakan `htmlentities()`.
-   - Pola unduh berkas via ID dokumen (bukan direct path).
-   - Validasi ekstensi dan hashing nama file upload.
+   - Penggunaan Parameterized Query / Prepared Statements / ORM resmi (dengan mitigasi alternatif: escaping, strict type casting, whitelist jika non-parameterized).
+   - Sanitasi parameter input pengguna (seperti query parameter URL) saat dirender ke HTML/antarmuka (XSS prevention).
+   - Pola unduh berkas berbasis ID dokumen terverifikasi (bukan direct filesystem path atau nama file di URL).
+   - Validasi whitelist ekstensi serta MIME type dan hashing nama file upload.
 2. Integritas Data (Integrity):
-   - Transaksi database (`trans_start` / `commit` & `rollback`) pada aksi penyimpanan.
+   - Transaksi database (commit & rollback) pada operasi penulisan data back-end (insert, update, delete).
    - Definisi relasi Foreign Key antar tabel.
    - Ketersediaan validasi di sisi Back End sebelum Front End.
 3. Fleksibilitas & Skalabilitas:

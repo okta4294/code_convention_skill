@@ -24,15 +24,39 @@ Setiap fungsi atau prosedur wajib memiliki blok komentar yang menjelaskan:
 ---
 
 ### 💻 Template Blok Komentar yang Direkomendasikan
-```php
+Gunakan format komentar standar sesuai bahasa pemrograman target:
+
+**Format DocBlock (PHP, JavaScript, TypeScript, Java):**
+```javascript
 /**
  * 1. FUNGSI:
  *    [Jelaskan tujuan fungsi ini]
  *
  * 2. CARA KERJA:
- *    [Jelaskan alur singkat: parameter masuk, proses sanitasi/transaksi/query, nilai balik]
+ *    [Jelaskan alur ringkas: parameter masuk, proses validasi/transaksi/query, nilai balik]
  *
  * 3. CARA PENGGUNAAN:
- *    [Contoh pemanggilan: $result = f_nama_fungsi($param1,$param2);]
+ *    [Contoh pemanggilan: const result = await f_hitung_total(orderId, items);]
  */
+```
+
+**Format Docstring (Python):**
+```python
+"""
+1. FUNGSI:
+   [Jelaskan tujuan fungsi ini]
+
+2. CARA KERJA:
+   [Jelaskan alur ringkas: parameter masuk, proses validasi/transaksi/query, nilai balik]
+
+3. CARA PENGGUNAAN:
+   [Contoh pemanggilan: result = f_hitung_total(order_id, items)]
+"""
+```
+
+**Format Line Comment (Go, C#, Rust):**
+```go
+// 1. FUNGSI: [Jelaskan tujuan fungsi ini]
+// 2. CARA KERJA: [Jelaskan alur ringkas: parameter masuk, proses, nilai balik]
+// 3. CARA PENGGUNAAN: result, err := f_hitung_total(orderID, items)
 ```

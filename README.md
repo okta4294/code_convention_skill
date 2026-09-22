@@ -106,8 +106,8 @@ Salin seluruh teks yang ada di dalam berkas [adapters/custom-gpt-instructions.tx
 | Perintah (Slash Command) | Fungsi & Aspek yang Diaudit |
 | :--- | :--- |
 | **`/review-all`** | Audit kepatuhan menyeluruh (Keamanan, Integritas, Skalabilitas, Penamaan, dan Dokumentasi). |
-| **`/review-security`** | Audit celah SQL Injection, sanitasi `$_GET` (`htmlentities`), ID download terproteksi, dan ekstensi file upload. |
-| **`/review-integrity`** | Audit transaksi database (*commit/rollback*), relasi *Foreign Key*, dan validasi berlapis *Back-End*. |
+| **`/review-security`** | Audit celah SQL Injection (parameterized queries / fallback mitigations), sanitasi parameter input & XSS, ID download terproteksi, dan validasi upload. |
+| **`/review-integrity`** | Audit transaksi database (*commit/rollback* multi-framework), relasi *Foreign Key*, dan validasi berlapis *Back-End*. |
 | **`/check-db-naming`** | Memvalidasi awalan nama objek basis data (`t_`, `v_`, `fk_`, `f_`, `sp_`, `tr_`). |
 | **`/check-branch`** | Memvalidasi format nama Git branch (`<kategori>/<modul>/<deskripsi>`). |
 | **`/comment`** | Menghasilkan template blok komentar 3 poin wajib (Fungsi, Cara Kerja, Cara Pakai). |

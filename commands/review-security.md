@@ -9,26 +9,26 @@ Melakukan audit khusus keamanan aplikasi (Secured Programming) untuk mendeteksi 
 - Berikan saran perbaikan kode yang mengutamakan keamanan dan sanitasi input/output.
 
 ## Aturan Kepatuhan Khusus
-1. SQL Injection & Penanganan Non-PDO/mysqli:
+1. SQL Injection & Penanganan Database Tanpa Parameterized Query:
    - Dilarang merangkai variabel mentah ke dalam string query SQL.
-   - Wajib memprioritaskan Parameterized Query / Prepared Statements via PDO atau MySQLi (object-oriented maupun procedural), atau Query Builder framework.
-   - **Alternatif Jika Aplikasi Terlanjur Tidak Menggunakan PDO/MySQLi:**
-     Apabila arsitektur aplikasi eksisting belum memungkinkan penggunaan PDO/mysqli, AI wajib menyarankan strategi pengamanan alternatif berikut:
-     * **Fungsi Pelolosan Karakter (Escaping):** Gunakan fungsi escaping bawaan driver basis data aktif atau fungsi native seperti `addslashes()`.
-     * **Strict Type Casting:** Paksa parameter numerik menjadi integer menggunakan type casting `(int)$id` atau `intval($id)` agar payload karakter kutip tereliminasi.
-     * **Whitelist Validation:** Untuk input dinamis non-parameterized (seperti kolom sorting, klausa `ORDER BY`, `ASC`/`DESC`), validasi ketat menggunakan daftar nilai putih (*whitelist*) via `in_array()`.
-     * **Validasi Format (Regex/Filter):** Gunakan `filter_var()` (misal `FILTER_VALIDATE_INT`, `FILTER_VALIDATE_EMAIL`) atau `preg_match()` sebelum variabel disisipkan ke query.
-     * **Protokol Konfirmasi:** AI wajib menanyakan apakah developer ingin menerapkan sanitasi alternatif tersebut atau migrasi bertahap ke PDO/mysqli.
-2. Sanitasi Parameter GET (XSS Prevention):
-   - Setiap variabel `$_GET` yang dicetak langsung ke antarmuka/HTML wajib dibungkus fungsi `htmlentities()`.
+   - Wajib memprioritaskan Parameterized Query / Prepared Statements (contoh: PDO/MySQLi pada PHP, query berparameter pada Node.js/pg/Prisma, SQLAlchemy/Django ORM pada Python, PreparedStatement pada Java, atau Query Builder resmi framework).
+   - **Alternatif Jika Arsitektur Belum Menggunakan Parameterized Query:**
+     Apabila aplikasi legasi belum memungkinkan prepared statements, AI wajib menyarankan strategi pengamanan alternatif:
+     * **Fungsi Pelolosan Karakter (Escaping):** Gunakan fungsi pelolosan bawaan driver basis data aktif (misal `mysqli_real_escape_string`, driver-specific escape) atau utilitas sanitasi karakter bahasa terkait.
+     * **Strict Type Casting:** Paksa parameter numerik menjadi bilangan bulat/desimal secara eksplisit (misal `(int)$id` di PHP, `Number.parseInt()` di JS/TS, `int()` di Python) agar payload karakter kutip tereliminasi.
+     * **Whitelist Validation:** Untuk input dinamis non-parameterized (seperti nama kolom sorting, klausa `ORDER BY`, arah `ASC`/`DESC`), validasi ketat menggunakan daftar nilai putih (*whitelist*) sebelum query dieksekusi.
+     * **Validasi Format (Regex/Filter):** Gunakan fungsi validasi format (misal `filter_var()` di PHP, validator library, atau regular expression pola aman) sebelum variabel disisipkan ke query.
+     * **Protokol Konfirmasi:** AI wajib menanyakan apakah developer ingin menerapkan sanitasi alternatif tersebut atau melakukan migrasi bertahap ke prepared statements.
+2. Sanitasi Parameter Input ke Tampilan (XSS Prevention):
+   - Setiap parameter input pengguna (misal query parameter `$_GET` di PHP, `req.query` di Express/Node.js, `request.GET` di Django, atau URL query params lainnya) yang dicetak langsung ke antarmuka/HTML wajib dibungkus fungsi encoding/escaping HTML kontekstual (misal `htmlentities()` / `htmlspecialchars()` di PHP, atau template engine auto-escaping).
 3. Metode Download Berkas:
-   - Dilarang memberikan path berkas langsung atau parameter GET seperti `?file=laporan.pdf`.
-   - Wajib menggunakan ID dokumen (`?id=1` atau `/download/1`) disertai pengecekan otentikasi dan otorisasi akses pengguna.
+   - Dilarang memberikan path berkas langsung atau parameter nama file sistem di URL (misal: `?file=laporan.pdf` atau `/files/laporan.pdf`).
+   - Wajib menggunakan verifikasi ID dokumen (misal `?id=1` atau `/download/1`) disertai pengecekan otentikasi dan otorisasi akses pengguna sebelum berkas dialirkan (*stream*).
 4. Upload Berkas:
-   - Nama berkas wajib di-rename menggunakan mekanisme hashing unik.
-   - Wajib melakukan validasi whitelist ekstensi berkas yang diizinkan.
+   - Nama berkas wajib di-rename menggunakan mekanisme hashing unik (misal UUID atau hash acak).
+   - Wajib melakukan validasi daftar putih (*whitelist*) ekstensi berkas dan MIME type yang diizinkan.
 5. Otorisasi Konten:
-   - Hak akses konten wajib berbasis peran (role) yang terdaftar di basis data.
+   - Hak akses konten dan manipulasi data wajib berbasis peran (*role*) yang terdaftar di basis data.
 
 ## Format Output Wajib
 ### 📋 Ringkasan Audit Kepatuhan: Keamanan

@@ -10,15 +10,15 @@ This project uses an automated compliance reviewer based on corporate engineerin
 ## Key Compliance Checklists
 
 ### 1. Security (Secured Programming)
-- **SQL Injection**: Prohibit direct variable concatenation in SQL strings. Mandate Parameterized Queries / Prepared Statements (PDO/mysqli) or framework Query Builder.
-  * **Fallback Mitigations (If PDO/mysqli is Not Feasible):** If the application cannot immediately adopt PDO/mysqli, the AI must suggest: (1) Database driver escaping or native `addslashes()`, (2) Strict numeric type casting `(int)$id`, (3) Strict whitelist arrays (`in_array()`) for dynamic clauses like `ORDER BY`, (4) Format/regex validation via `filter_var()`, and (5) Prompt the developer for confirmation between emergency sanitization or gradual migration.
-- **XSS Prevention**: Wrap any `$_GET` variable rendered in HTML with `htmlentities()`.
-- **Download Security**: File downloads must use document ID routing (e.g., `/download?id=1` or `/download/1`) accompanied by authentication and role authorization checks. Never expose file paths or names in query params.
-- **Upload Security**: Validate allowed extensions against a strict whitelist and hash filenames uniquely upon storage.
+- **SQL Injection**: Prohibit direct variable concatenation in SQL strings. Mandate Parameterized Queries / Prepared Statements (e.g., PDO/MySQLi in PHP, parameterized queries in Node.js/pg/Prisma, SQLAlchemy/Django in Python, PreparedStatement in Java) or framework Query Builder / ORM.
+  * **Fallback Mitigations (If Parameterized Queries Are Not Feasible):** If the application cannot immediately adopt prepared statements, the AI must suggest: (1) Database driver escaping or language-native sanitization, (2) Strict numeric type casting (e.g., `(int)$id`, `Number.parseInt()`, `int()`), (3) Strict whitelist arrays for dynamic clauses like `ORDER BY` and sorting, (4) Format/regex validation before query construction, and (5) Prompt the developer for confirmation between emergency sanitization or gradual migration.
+- **XSS Prevention**: Sanitize user input parameters (e.g., `$_GET`, `req.query`, `request.GET`, URL query params) rendered in HTML/views using contextual HTML escaping / encoding (e.g., `htmlentities()` in PHP, template engine auto-escaping, or HTML sanitize utilities).
+- **Download Security**: File downloads must use document ID routing (e.g., `/download?id=1` or `/download/1`) accompanied by authentication and role authorization checks. Never expose direct filesystem paths or filenames in URL parameters.
+- **Upload Security**: Validate allowed extensions and MIME types against a strict whitelist; hash filenames uniquely upon storage.
 
 ### 2. Integrity & Architecture
-- **Transactions**: Back-end database writes must use transaction wrappers (`trans_start` / `trans_commit` / `trans_rollback` or PDO `beginTransaction` / `commit` / `rollBack`).
-- **Foreign Keys**: Enforce Foreign Key constraints for relational tables from the ERD design stage.
+- **Transactions**: Back-end database writes must use transaction wrappers with rollback on failure (e.g., PDO/Laravel/CI in PHP, Prisma/Knex/TypeORM in Node.js, `transaction.atomic()` in Python, `@Transactional` in Java, `db.Begin()` in Go/C#).
+- **Foreign Keys**: Enforce Foreign Key constraints for relational tables from the ERD design stage (`fk_<table_abbreviation>_<column_name>`).
 - **Server-Side Validation**: Server-side (Back-End) validation must always be present and tested with JavaScript disabled.
 - **Decoupled Settings**: Store external API endpoints and approval workflows in database tables rather than hardcoding them.
 - **Scalability**: High-volume tables must use server-side pagination instead of client-side DOM processing.

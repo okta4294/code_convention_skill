@@ -13,13 +13,13 @@ Whenever the user asks for a review, audit, or slash command:
 
 ## Core Standards
 1. Security:
-   - Always use Parameterized Queries / Prepared Statements (mysqli, PDO, or Query Builder) for database operations to prevent SQL Injection.
-     * Fallback if PDO/mysqli is not feasible: Suggest alternative mitigations: (1) database escaping/addslashes(), (2) strict integer type casting `(int)$id`, (3) whitelist validation via `in_array()` for dynamic clauses (e.g. ORDER BY/sorting), (4) format validation (`filter_var`/regex), and (5) ask developer confirmation between alternative sanitization vs gradual migration.
-   - Output from $_GET parameters displayed in HTML must be sanitized using htmlentities().
+   - Always use Parameterized Queries / Prepared Statements / ORM for database operations to prevent SQL Injection (e.g. PDO/MySQLi, Node.js/pg/Prisma, SQLAlchemy, PreparedStatement).
+     * Fallback if parameterized queries are not feasible: Suggest alternative mitigations: (1) database escaping/sanitization, (2) strict integer/numeric type casting (e.g. `(int)$id`, `parseInt`), (3) whitelist validation for dynamic clauses (e.g. ORDER BY/sorting), (4) format validation (filter/regex), and (5) ask developer confirmation between alternative sanitization vs gradual migration.
+   - User input parameters (e.g. URL query params) rendered into HTML/views must be sanitized using contextual HTML escaping / encoding (e.g. `htmlentities()`, template auto-escaping).
    - File downloads must use document ID validation with auth/role checks (never expose raw file paths or filenames in URL parameters).
-   - Uploaded files must use unique hashed filenames and whitelist extension validation.
+   - Uploaded files must use unique hashed filenames and whitelist extension/MIME validation.
 2. Integrity:
-   - Back-end database write operations (insert, update, delete) MUST use database transactions (trans_start/commit/rollback).
+   - Back-end database write operations (insert, update, delete) MUST use database transactions with rollback upon errors (e.g. PDO/Laravel/CI transactions, Prisma `$transaction`, `@Transactional`, `db.Begin`).
    - Relational tables must define explicit Foreign Keys starting from ERD design.
    - Dual-layer validation is mandatory: server-side (back-end) validation takes precedence over client-side (front-end) validation.
 3. Flexibility & Scalability:
