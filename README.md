@@ -63,7 +63,25 @@ Jalankan langsung di dalam folder proyek target Anda:
 
 ---
 
-### 3. Web Chat / Custom GPT (OpenAI & Antigravity)
+### 3. Memilih AI Assistant Tertentu (Opsional)
+
+Jika dijalankan di terminal, skrip akan menampilkan menu interaktif. Anda juga dapat langsung menentukan AI target menggunakan flag:
+
+- **Hanya pasang Cursor:**
+  - Bash: `./install.sh --cursor`
+  - PowerShell: `.\install.ps1 -Cursor`
+- **Hanya pasang Claude Code (Global):**
+  - Bash: `./install.sh --global --claude`
+  - PowerShell: `.\install.ps1 -Global -Claude`
+- **Hanya pasang Antigravity & OpenCode:**
+  - Bash: `./install.sh --antigravity --opencode`
+  - PowerShell: `.\install.ps1 -Antigravity -OpenCode`
+
+Flag yang tersedia: `--cursor`, `--windsurf`, `--claude`, `--antigravity`, `--opencode`, `--all`.
+
+---
+
+### 4. Web Chat / Custom GPT (OpenAI & Antigravity)
 Salin seluruh teks yang ada di dalam berkas [adapters/custom-gpt-instructions.txt](file:///adapters/custom-gpt-instructions.txt) lalu tempel ke menu **Custom Instructions** atau **System Prompt**.
 
 ---
