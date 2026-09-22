@@ -1,0 +1,6 @@
+{
+  "name": "code_convention_skill",
+  "version": "1.0.0",
+  "description": "Corporate code quality, secured programming, and architecture compliance advisor.",
+  "contextFileName": "adapters/AGENTS.md"
+}

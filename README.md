@@ -22,9 +22,24 @@ Untuk menjaga stabilitas repositori dan kepemilikan kode oleh developer (*Develo
 
 ## Panduan Instalasi Cepat
 
-### 1. Instalasi Instan
+### 1. Pemasangan Native Plugin (Antigravity & Gemini CLI)
 
-Cukup jalankan satu baris perintah berikut di terminal:
+Bagi pengguna Google Antigravity atau Gemini CLI, plugin ini dapat dipasang langsung menggunakan perintah *plugin manager* bawaan:
+
+- **Google Antigravity CLI (`agy`):**
+  ```bash
+  agy plugin install https://github.com/okta4294/code_convention_skill
+  ```
+- **Gemini CLI:**
+  ```bash
+  gemini extension install https://github.com/okta4294/code_convention_skill
+  ```
+
+---
+
+### 2. Instalasi Instan 1-Baris (Multi-Agent & Seluruh IDE)
+
+Untuk memasang konfigurasi ke Cursor, Windsurf, Claude Code, OpenCode, atau Antigravity tanpa perlu clone repositori:
 
 #### Pemasangan Global (Aktif di Semua Proyek Pengguna)
 Otomatis memasang aturan ke Antigravity (`~/.gemini/config/`), Claude Code (`~/.claude/`), dan OpenCode (`~/.config/opencode/`):
@@ -52,7 +67,7 @@ Jalankan langsung di dalam folder proyek target Anda:
 
 ---
 
-### 2. Instalasi dari Repositori Lokal (Jika Sudah di-Clone)
+### 3. Instalasi dari Repositori Lokal (Jika Sudah di-Clone)
 
 - **Mode Global:**
   - Bash: `./install.sh --global`
@@ -63,7 +78,7 @@ Jalankan langsung di dalam folder proyek target Anda:
 
 ---
 
-### 3. Memilih AI Assistant Tertentu (Opsional)
+### 4. Memilih AI Assistant Tertentu (Opsional)
 
 Jika dijalankan di terminal, skrip akan menampilkan menu interaktif. Anda juga dapat langsung menentukan AI target menggunakan flag:
 
@@ -81,7 +96,7 @@ Flag yang tersedia: `--cursor`, `--windsurf`, `--claude`, `--antigravity`, `--op
 
 ---
 
-### 4. Web Chat / Custom GPT (OpenAI & Antigravity)
+### 5. Web Chat / Custom GPT (OpenAI & Antigravity)
 Salin seluruh teks yang ada di dalam berkas [adapters/custom-gpt-instructions.txt](file:///adapters/custom-gpt-instructions.txt) lalu tempel ke menu **Custom Instructions** atau **System Prompt**.
 
 ---
