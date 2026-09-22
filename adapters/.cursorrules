@@ -14,6 +14,7 @@ Whenever the user asks for a review, audit, or slash command:
 ## Core Standards
 1. Security:
    - Always use Parameterized Queries / Prepared Statements (mysqli, PDO, or Query Builder) for database operations to prevent SQL Injection.
+     * Fallback if PDO/mysqli is not feasible: Suggest alternative mitigations: (1) database escaping/addslashes(), (2) strict integer type casting `(int)$id`, (3) whitelist validation via `in_array()` for dynamic clauses (e.g. ORDER BY/sorting), (4) format validation (`filter_var`/regex), and (5) ask developer confirmation between alternative sanitization vs gradual migration.
    - Output from $_GET parameters displayed in HTML must be sanitized using htmlentities().
    - File downloads must use document ID validation with auth/role checks (never expose raw file paths or filenames in URL parameters).
    - Uploaded files must use unique hashed filenames and whitelist extension validation.

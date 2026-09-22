@@ -11,7 +11,7 @@ Menjalankan audit menyeluruh terhadap kode, skema basis data, atau berkas konfig
 
 ## Daftar Periksa Audit
 1. Keamanan (Security):
-   - Penggunaan Parameterized Query / Prepared Statements (mysqli/PDO/Query Builder) untuk query database.
+   - Penggunaan Parameterized Query / Prepared Statements (mysqli/PDO/Query Builder) untuk query database (atau mitigasi alternatif: escaping, strict type casting integer, whitelist validation jika non-PDO/mysqli).
    - Sanitasi parameter GET menggunakan `htmlentities()`.
    - Pola unduh berkas via ID dokumen (bukan direct path).
    - Validasi ekstensi dan hashing nama file upload.

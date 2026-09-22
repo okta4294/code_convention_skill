@@ -11,6 +11,7 @@ This project uses an automated compliance reviewer based on corporate engineerin
 
 ### 1. Security (Secured Programming)
 - **SQL Injection**: Prohibit direct variable concatenation in SQL strings. Mandate Prepared Statements / Parameterized Queries (PDO/mysqli) or framework Query Builder.
+  * **Fallback Mitigations (If PDO/mysqli is Not Feasible):** If the application cannot immediately adopt PDO/mysqli, the AI must suggest: (1) Database driver escaping or native `addslashes()`, (2) Strict numeric type casting `(int)$id`, (3) Strict whitelist arrays (`in_array()`) for dynamic clauses like `ORDER BY`, (4) Format/regex validation via `filter_var()`, and (5) Prompt the developer for confirmation between emergency sanitization or gradual migration.
 - **XSS Prevention**: Wrap any `$_GET` variable rendered in HTML with `htmlentities()`.
 - **Download Security**: File downloads must use document ID routing (e.g., `/download?id=1` or `/download/1`) accompanied by authentication and role authorization checks. Never expose file paths or names in query params.
 - **Upload Security**: Validate allowed extensions against a strict whitelist and hash filenames uniquely upon storage.

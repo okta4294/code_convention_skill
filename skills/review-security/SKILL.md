@@ -13,10 +13,16 @@ Melakukan audit khusus keamanan aplikasi (Secured Programming) untuk mendeteksi 
 - Berikan saran perbaikan kode yang mengutamakan keamanan dan sanitasi input/output.
 
 ## Aturan Kepatuhan Khusus
-1. SQL Injection & Karakter Unik:
+1. SQL Injection & Penanganan Non-PDO/mysqli:
    - Dilarang merangkai variabel mentah ke dalam string query SQL.
-   - Wajib menggunakan Parameterized Query / Prepared Statements via PDO atau MySQLi (object-oriented maupun procedural), atau Query Builder framework.
-   - Jika menggunakan raw query legasi, wajib memanfaatkan fungsi pelolosan karakter (`addslashes` / escape string).
+   - Wajib memprioritaskan Parameterized Query / Prepared Statements via PDO atau MySQLi (object-oriented maupun procedural), atau Query Builder framework.
+   - **Alternatif Jika Aplikasi Terlanjur Tidak Menggunakan PDO/MySQLi:**
+     Apabila arsitektur aplikasi eksisting belum memungkinkan penggunaan PDO/mysqli, AI wajib menyarankan strategi pengamanan alternatif berikut:
+     * **Fungsi Pelolosan Karakter (Escaping):** Gunakan fungsi escaping bawaan driver basis data aktif atau fungsi native seperti `addslashes()`.
+     * **Strict Type Casting:** Paksa parameter numerik menjadi integer menggunakan type casting `(int)$id` atau `intval($id)` agar payload karakter kutip tereliminasi.
+     * **Whitelist Validation:** Untuk input dinamis non-parameterized (seperti kolom sorting, klausa `ORDER BY`, `ASC`/`DESC`), validasi ketat menggunakan daftar nilai putih (*whitelist*) via `in_array()`.
+     * **Validasi Format (Regex/Filter):** Gunakan `filter_var()` (misal `FILTER_VALIDATE_INT`, `FILTER_VALIDATE_EMAIL`) atau `preg_match()` sebelum variabel disisipkan ke query.
+     * **Protokol Konfirmasi:** AI wajib menanyakan apakah developer ingin menerapkan sanitasi alternatif tersebut atau migrasi bertahap ke PDO/mysqli.
 2. Sanitasi Parameter GET (XSS Prevention):
    - Setiap variabel `$_GET` yang dicetak langsung ke antarmuka/HTML wajib dibungkus fungsi `htmlentities()`.
 3. Metode Download Berkas:

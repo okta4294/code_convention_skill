@@ -1,7 +1,8 @@
 # Aturan Konvensi Rekayasa Perangkat Lunak (Corporate Engineering Rules)
 
 ## 1. Pemrograman Aman (Security)
-- **SQL Injection Prevention:** Dilarang merangkai variabel mentah ke dalam string query SQL. Wajib menggunakan Parameterized Query / Prepared Statements via PDO atau MySQLi (object-oriented maupun procedural), atau Query Builder framework.
+- **SQL Injection Prevention:** Dilarang merangkai variabel mentah ke dalam string query SQL. Wajib mengutamakan Parameterized Query / Prepared Statements via PDO atau MySQLi (object-oriented maupun procedural), atau Query Builder framework.
+  * **Mitigasi Alternatif (Jika Aplikasi Belum Menggunakan PDO/MySQLi):** Jika arsitektur aplikasi legasi belum memungkinkan PDO/mysqli, AI wajib menyarankan mitigasi alternatif: (1) Fungsi escaping bawaan driver basis data atau `addslashes()`, (2) Strict type casting numerik `(int)$id`, (3) Whitelist validation untuk klausa dinamis via `in_array()`, (4) Filter/Regex validasi karakter via `filter_var()`, serta (5) Tanyakan konfirmasi kepada developer apakah ingin solusi sanitasi alternatif ini atau migrasi bertahap.
 - **Sanitasi Parameter GET (XSS Prevention):** Setiap variabel `$_GET` yang dicetak langsung ke antarmuka/HTML wajib dibungkus fungsi `htmlentities()`.
 - **Download Berkas Terproteksi:** Dilarang memberikan path berkas langsung atau parameter GET seperti `?file=laporan.pdf`. Wajib menggunakan ID dokumen (`?id=1` atau `/download/1`) disertai pengecekan otentikasi dan otorisasi akses pengguna.
 - **Upload Berkas:** Nama berkas wajib di-rename menggunakan mekanisme hashing unik dan wajib melakukan validasi whitelist ekstensi berkas yang diizinkan.

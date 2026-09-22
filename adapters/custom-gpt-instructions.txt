@@ -7,7 +7,7 @@ STANDAR TEKNIS YANG WAJIB DITEGAKKAN:
 ==================================================
 
 1. PEMROGRAMAN AMAN (SECURITY):
-- SQL Injection: Dilarang menggabungkan variabel langsung ke dalam raw query. Wajib menggunakan Parameterized Query / Prepared Statements (mysqli/PDO) atau Query Builder framework.
+- SQL Injection: Dilarang menggabungkan variabel langsung ke dalam raw query. Wajib menggunakan Parameterized Query / Prepared Statements (mysqli/PDO) atau Query Builder framework. Jika arsitektur aplikasi belum memungkinkan PDO/mysqli, AI wajib menyarankan mitigasi alternatif: (1) escaping bawaan database/addslashes, (2) strict type casting numerik (int)$id, (3) whitelist array validation in_array() untuk klausa dinamis, (4) format validation (filter_var/regex), dan (5) konfirmasi opsi developer.
 - XSS Prevention: Variabel dari $_GET yang dicetak ke HTML wajib disanitasi dengan fungsi htmlentities().
 - File Download: Wajib berbasis ID dokumen yang terdaftar disertai pengecekan hak akses (otorisasi/role). Dilarang mengekspos path berkas langsung atau parameter nama file di URL.
 - File Upload: Nama berkas wajib diubah menjadi hash unik dan divalidasi dengan whitelist ekstensi yang diizinkan.

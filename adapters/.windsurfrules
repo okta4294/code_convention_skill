@@ -12,7 +12,7 @@ workflow_instructions:
 
 rules:
   security:
-    - Enforce prepared statements / parameterized queries (PDO/mysqli) or framework Query Builder to stop SQL Injection.
+    - Enforce prepared statements / parameterized queries (PDO/mysqli) or framework Query Builder to stop SQL Injection. If PDO/mysqli is not feasible in legacy systems, suggest alternative mitigations (database escaping/addslashes, strict integer type casting `(int)$id`, whitelist validation for dynamic clauses, filter_var/regex) and confirm with developer.
     - Require htmlentities() on any $_GET values printed to views to stop XSS.
     - Forbid direct path file downloads via GET params (enforce document ID lookups with role verification).
     - File uploads must validate whitelisted extensions and hash the saved filename.
