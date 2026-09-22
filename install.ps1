@@ -39,33 +39,48 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-# Tentukan direktori sumber (lokal atau unduh sementara jika dijalankan via piping ire/iex)
+# Tentukan direktori sumber (hanya jika berkas dijalankan secara lokal dari disk)
 $ScriptDir = ""
 if ($PSScriptRoot) {
     $ScriptDir = $PSScriptRoot
-} elseif ($MyInvocation.MyCommand.Definition) {
+} elseif ($MyInvocation.MyCommand.Path) {
     try {
-        $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
+        $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
     } catch {
         $ScriptDir = ""
     }
 }
 
+$IsLocalRepo = (-not [string]::IsNullOrWhiteSpace($ScriptDir)) -and (Test-Path -LiteralPath $ScriptDir -PathType Container) -and (Test-Path -LiteralPath (Join-Path $ScriptDir "adapters"))
+
 $TempDir = ""
 $CleanupNeeded = $false
 
 try {
-    if (-not $ScriptDir -or -not (Test-Path (Join-Path $ScriptDir "adapters"))) {
+    if (-not $IsLocalRepo) {
         $RepoUrl = if ($env:CODE_CONVENTION_REPO) { $env:CODE_CONVENTION_REPO } else { "https://github.com/okta4294/code_convention_skill.git" }
         Write-Host "Mengunduh konfigurasi dari repositori..."
         $TempDir = Join-Path $env:TEMP ("code_conv_" + [System.Guid]::NewGuid().ToString("N"))
         New-Item -ItemType Directory -Path $TempDir -Force | Out-Null
         $CleanupNeeded = $true
 
+        $Cloned = $false
         if (Get-Command git -ErrorAction SilentlyContinue) {
-            git clone --depth 1 $RepoUrl $TempDir 2>$null
-            $SourceDir = $TempDir
-        } else {
+            try {
+                $prevEAP = $ErrorActionPreference
+                $ErrorActionPreference = "Continue"
+                git clone --quiet --depth 1 $RepoUrl $TempDir 2>&1 | Out-Null
+                $ErrorActionPreference = $prevEAP
+                if (Test-Path -LiteralPath (Join-Path $TempDir "adapters")) {
+                    $SourceDir = $TempDir
+                    $Cloned = $true
+                }
+            } catch {
+                $Cloned = $false
+            }
+        }
+        
+        if (-not $Cloned) {
             $ZipUrl = $RepoUrl -replace "\.git$", "/archive/refs/heads/main.zip"
             $ZipPath = Join-Path $env:TEMP "code_convention.zip"
             Invoke-WebRequest -Uri $ZipUrl -OutFile $ZipPath
@@ -79,7 +94,7 @@ try {
     }
 
     $UserHome = [Environment]::GetFolderPath("UserProfile")
-    $IsGlobal = $Global.IsPresent -or ($args -contains "-Global") -or ($args -contains "--global") -or ($args -contains "-g") -or ($env:GLOBAL -eq "1") -or ($env:GLOBAL -eq "true")
+    $IsGlobal = ($PSBoundParameters.ContainsKey('Global') -and $Global) -or $Global.IsPresent -or ($args -contains "-Global") -or ($args -contains "--global") -or ($args -contains "-g") -or ($env:GLOBAL -eq "1") -or ($env:GLOBAL -eq "true")
 
     # Deteksi pilihan alat
     $DoCursor = $Cursor.IsPresent -or ($args -contains "-Cursor") -or ($args -contains "--cursor")
