@@ -1,4 +1,4 @@
-# Corporate Code Quality & Compliance Advisor
+# Code Quality & Compliance Advisor
 
 Standar konvensi pengembangan perangkat lunak, pemrograman aman (*secured programming*), integritas basis data, dan aturan arsitektur untuk asisten AI (*AI Coding Agents*).
 
