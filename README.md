@@ -20,84 +20,175 @@ Untuk menjaga stabilitas repositori dan kepemilikan kode oleh developer (*Develo
 
 ---
 
-## Panduan Instalasi Cepat
+## Panduan Instalasi & Uninstall Lengkap
 
-### 1. Pemasangan Native Plugin (Antigravity & Gemini CLI)
-
-Bagi pengguna Google Antigravity atau Gemini CLI, plugin ini dapat dipasang langsung menggunakan perintah *plugin manager* bawaan:
-
-- **Google Antigravity CLI (`agy`):**
-  ```bash
-  agy plugin install https://github.com/okta4294/code_convention_skill
-  ```
-- **Gemini CLI:**
-  ```bash
-  gemini extension install https://github.com/okta4294/code_convention_skill
-  ```
+Aturan ini dapat dipasang dan dicopot (*uninstall*) dengan sangat mudah, baik menggunakan skrip otomatis maupun langkah manual per AI Agent.
 
 ---
 
-### 2. Instalasi Instan 1-Baris (Multi-Agent & Seluruh IDE)
+### 1. Google Antigravity & Gemini CLI
 
-Untuk memasang konfigurasi ke Cursor, Windsurf, Claude Code, OpenCode, atau Antigravity tanpa perlu clone repositori:
+#### A. Menggunakan Plugin Manager Resmi (Direkomendasikan)
+- **Instalasi:**
+  * **Google Antigravity CLI (`agy`):**
+    ```bash
+    agy plugin install https://github.com/okta4294/code_convention_skill
+    ```
+  * **Gemini CLI:**
+    ```bash
+    gemini extension install https://github.com/okta4294/code_convention_skill
+    ```
+- **Uninstall:**
+  * **Google Antigravity CLI (`agy`):**
+    ```bash
+    agy plugin uninstall code_convention_skill
+    ```
+  * **Gemini CLI:**
+    ```bash
+    gemini extension uninstall code_convention_skill
+    ```
 
-#### Pemasangan Global (Aktif di Semua Proyek Pengguna)
-Otomatis memasang aturan ke Antigravity (`~/.gemini/config/`), Claude Code (`~/.claude/`), dan OpenCode (`~/.config/opencode/`):
+#### B. Menggunakan Skrip Otomatis
+- **Instalasi Global (Semua Proyek):**
+  * PowerShell: `.\install.ps1 -Global -Antigravity`
+  * Bash: `./install.sh --global --antigravity`
+- **Instalasi Lokal (Proyek Saat Ini):**
+  * PowerShell: `.\install.ps1 -Antigravity`
+  * Bash: `./install.sh --antigravity`
+- **Uninstall Otomatis:**
+  * Global (PowerShell): `.\install.ps1 -Global -Antigravity -Uninstall`
+  * Global (Bash): `./install.sh --global --antigravity --uninstall`
+  * Lokal (PowerShell): `.\install.ps1 -Antigravity -Uninstall`
+  * Lokal (Bash): `./install.sh --antigravity --uninstall`
 
-- **Linux / macOS / Git Bash:**
-  ```bash
-  curl -fsSL https://raw.githubusercontent.com/okta4294/code_convention_skill/main/install.sh | bash -s -- --global
-  ```
-- **Windows PowerShell:**
+#### C. Uninstall Manual
+- **Global:** Hapus folder `review-all`, `review-security`, `review-integrity`, `check-db-naming`, `check-branch`, `comment`, dan `check-ui` dari `~/.gemini/config/skills/`, serta hapus file `~/.gemini/config/rules/corporate-rules.md`.
+- **Lokal Proyek:** Hapus folder `.agents/skills/` dan file `.agents/rules/corporate-rules.md`.
+
+---
+
+### 2. Cursor IDE
+
+#### A. Menggunakan Skrip Otomatis
+- **Instalasi Lokal:**
+  * PowerShell: `.\install.ps1 -Cursor`
+  * Bash: `./install.sh --cursor`
+- **Instalasi Global:**
+  * PowerShell: `.\install.ps1 -Global -Cursor`
+  * Bash: `./install.sh --global --cursor`
+- **Uninstall Otomatis:**
+  * Lokal: `.\install.ps1 -Cursor -Uninstall` (PowerShell) / `./install.sh --cursor --uninstall` (Bash)
+  * Global: `.\install.ps1 -Global -Cursor -Uninstall` (PowerShell) / `./install.sh --global --cursor --uninstall` (Bash)
+
+#### B. Manual
+- **Instalasi:** Salin file `adapters/.cursorrules` ke *root directory* proyek Anda (atau ke direktori pengguna `~/.cursorrules`).
+- **Uninstall:** Hapus file `.cursorrules` dari *root directory* proyek Anda (atau dari `%USERPROFILE%\.cursorrules` / `~/.cursorrules`).
+
+---
+
+### 3. Windsurf IDE (Cascade)
+
+#### A. Menggunakan Skrip Otomatis
+- **Instalasi Lokal:**
+  * PowerShell: `.\install.ps1 -Windsurf`
+  * Bash: `./install.sh --windsurf`
+- **Instalasi Global:**
+  * PowerShell: `.\install.ps1 -Global -Windsurf`
+  * Bash: `./install.sh --global --windsurf`
+- **Uninstall Otomatis:**
+  * Lokal: `.\install.ps1 -Windsurf -Uninstall` (PowerShell) / `./install.sh --windsurf --uninstall` (Bash)
+  * Global: `.\install.ps1 -Global -Windsurf -Uninstall` (PowerShell) / `./install.sh --global --windsurf --uninstall` (Bash)
+
+#### B. Manual
+- **Instalasi:** Salin file `adapters/.windsurfrules` ke *root directory* proyek Anda (atau ke direktori pengguna `~/.windsurfrules`).
+- **Uninstall:** Hapus file `.windsurfrules` dari *root directory* proyek Anda (atau dari `%USERPROFILE%\.windsurfrules` / `~/.windsurfrules`).
+
+---
+
+### 4. Claude Code / Claude Desktop
+
+#### A. Menggunakan Skrip Otomatis
+- **Instalasi Lokal:**
+  * PowerShell: `.\install.ps1 -Claude`
+  * Bash: `./install.sh --claude`
+- **Instalasi Global:**
+  * PowerShell: `.\install.ps1 -Global -Claude`
+  * Bash: `./install.sh --global --claude`
+- **Uninstall Otomatis:**
+  * Lokal: `.\install.ps1 -Claude -Uninstall` (PowerShell) / `./install.sh --claude --uninstall` (Bash)
+  * Global: `.\install.ps1 -Global -Claude -Uninstall` (PowerShell) / `./install.sh --global --claude --uninstall` (Bash)
+
+#### B. Manual
+- **Instalasi:** Salin file `adapters/CLAUDE.md` ke *root directory* proyek Anda (atau ke folder global `~/.claude/CLAUDE.md`).
+- **Uninstall:** Hapus file `CLAUDE.md` dari *root directory* proyek Anda (atau hapus file `~/.claude/CLAUDE.md`).
+
+---
+
+### 5. OpenCode
+
+#### A. Menggunakan Skrip Otomatis
+- **Instalasi Lokal:**
+  * PowerShell: `.\install.ps1 -OpenCode`
+  * Bash: `./install.sh --opencode`
+- **Instalasi Global:**
+  * PowerShell: `.\install.ps1 -Global -OpenCode`
+  * Bash: `./install.sh --global --opencode`
+- **Uninstall Otomatis:**
+  * Lokal: `.\install.ps1 -OpenCode -Uninstall` (PowerShell) / `./install.sh --opencode --uninstall` (Bash)
+  * Global: `.\install.ps1 -Global -OpenCode -Uninstall` (PowerShell) / `./install.sh --global --opencode --uninstall` (Bash)
+
+#### B. Manual
+- **Instalasi:**
+  * Salin file `adapters/AGENTS.md` ke *root directory* proyek (atau ke `~/.config/opencode/AGENTS.md`).
+  * Salin isi folder `commands/` ke `.opencode/commands/` di root proyek (atau ke `~/.config/opencode/commands/`).
+- **Uninstall:**
+  * Hapus `AGENTS.md` dan folder `.opencode/commands/` dari proyek Anda (atau dari folder `~/.config/opencode/`).
+
+---
+
+### 6. Web Chat / Custom GPTs (ChatGPT, Claude Web, Gemini Web)
+- **Instalasi:** Salin seluruh teks yang ada di dalam berkas [adapters/custom-gpt-instructions.txt](file:///adapters/custom-gpt-instructions.txt) lalu tempel ke menu **Custom Instructions**, **System Prompt**, atau konfigurasi Custom GPT.
+- **Uninstall:** Buka menu pengaturan **Custom Instructions** / **System Prompt** pada peramban Anda, hapus seluruh teks instruksi tersebut, lalu simpan (*Save*).
+
+---
+
+### 7. Instalasi & Uninstall Instan 1-Baris (Tanpa Clone Repositori)
+
+#### Instalasi Instan (Semua AI Sekaligus)
+- **Global (Windows PowerShell):**
   ```powershell
   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/okta4294/code_convention_skill/main/install.ps1))) -Global
   ```
-
-#### Pemasangan Lokal (Hanya untuk Proyek Saat Ini)
-Jalankan langsung di dalam folder proyek target Anda:
-
-- **Linux / macOS / Git Bash:**
+- **Global (Linux / macOS / Git Bash):**
   ```bash
-  curl -fsSL https://raw.githubusercontent.com/okta4294/code_convention_skill/main/install.sh | bash
+  curl -fsSL https://raw.githubusercontent.com/okta4294/code_convention_skill/main/install.sh | bash -s -- --global
   ```
-- **Windows PowerShell:**
+- **Lokal Proyek (Windows PowerShell):**
   ```powershell
   irm https://raw.githubusercontent.com/okta4294/code_convention_skill/main/install.ps1 | iex
   ```
+- **Lokal Proyek (Linux / macOS / Git Bash):**
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/okta4294/code_convention_skill/main/install.sh | bash
+  ```
 
----
-
-### 3. Instalasi dari Repositori Lokal (Jika Sudah di-Clone)
-
-- **Mode Global:**
-  - Bash: `./install.sh --global`
-  - PowerShell: `.\install.ps1 -Global`
-- **Mode Lokal:**
-  - Bash: `./install.sh` atau `./install.sh /path/ke/proyek-anda`
-  - PowerShell: `.\install.ps1` atau `.\install.ps1 -TargetDir "D:\proyek\aplikasi-anda"`
-
----
-
-### 4. Memilih AI Assistant Tertentu (Opsional)
-
-Jika dijalankan di terminal, skrip akan menampilkan menu interaktif. Anda juga dapat langsung menentukan AI target menggunakan flag:
-
-- **Hanya pasang Cursor:**
-  - Bash: `./install.sh --cursor`
-  - PowerShell: `.\install.ps1 -Cursor`
-- **Hanya pasang Claude Code (Global):**
-  - Bash: `./install.sh --global --claude`
-  - PowerShell: `.\install.ps1 -Global -Claude`
-- **Hanya pasang Antigravity & OpenCode:**
-  - Bash: `./install.sh --antigravity --opencode`
-  - PowerShell: `.\install.ps1 -Antigravity -OpenCode`
-
-Flag yang tersedia: `--cursor`, `--windsurf`, `--claude`, `--antigravity`, `--opencode`, `--all`.
-
----
-
-### 5. Web Chat / Custom GPT (OpenAI & Antigravity)
-Salin seluruh teks yang ada di dalam berkas [adapters/custom-gpt-instructions.txt](file:///adapters/custom-gpt-instructions.txt) lalu tempel ke menu **Custom Instructions** atau **System Prompt**.
+#### Uninstall Instan 1-Baris
+- **Hapus Global (Windows PowerShell):**
+  ```powershell
+  & ([scriptblock]::Create((irm https://raw.githubusercontent.com/okta4294/code_convention_skill/main/install.ps1))) -Global -Uninstall
+  ```
+- **Hapus Global (Linux / macOS / Git Bash):**
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/okta4294/code_convention_skill/main/install.sh | bash -s -- --global --uninstall
+  ```
+- **Hapus Lokal (Windows PowerShell):**
+  ```powershell
+  & ([scriptblock]::Create((irm https://raw.githubusercontent.com/okta4294/code_convention_skill/main/install.ps1))) -Uninstall
+  ```
+- **Hapus Lokal (Linux / macOS / Git Bash):**
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/okta4294/code_convention_skill/main/install.sh | bash -s -- --uninstall
+  ```
 
 ---
 
@@ -105,13 +196,13 @@ Salin seluruh teks yang ada di dalam berkas [adapters/custom-gpt-instructions.tx
 
 | Perintah (Slash Command) | Fungsi & Aspek yang Diaudit |
 | :--- | :--- |
-| **`/review-all`** | Audit kepatuhan menyeluruh (Keamanan, Integritas, Skalabilitas, Penamaan, dan Dokumentasi). |
-| **`/review-security`** | Audit celah SQL Injection (parameterized queries / fallback mitigations), sanitasi parameter input & XSS, ID download terproteksi, dan validasi upload. |
-| **`/review-integrity`** | Audit transaksi database (*commit/rollback* multi-framework), relasi *Foreign Key*, dan validasi berlapis *Back-End*. |
-| **`/check-db-naming`** | Memvalidasi awalan nama objek basis data (`t_`, `v_`, `fk_`, `f_`, `sp_`, `tr_`). |
-| **`/check-branch`** | Memvalidasi format nama Git branch (`<kategori>/<modul>/<deskripsi>`). |
-| **`/comment`** | Menghasilkan template blok komentar 3 poin wajib (Fungsi, Cara Kerja, Cara Pakai). |
-| **`/check-ui`** | Memeriksa form vertikal, letak navigasi & logo, serta hierarki warna tombol (Submit = Biru, Delete = Merah, Cancel = Netral). |
+| **`/review-all`** | Audit kepatuhan menyeluruh (Konsep OOP & DRY, Keamanan, Integritas, Fleksibilitas & Skalabilitas, Penamaan & Alur Git, Dokumentasi 3 Poin, dan UI/UX). |
+| **`/review-security`** | Audit celah SQL Injection & karakter unik parsing data (`'`), sanitasi `htmlentities` pada parameter GET (XSS), metode download berbasis ID dokumen, hashing & validasi ekstensi upload file, serta otorisasi berbasis `role`. |
+| **`/review-integrity`** | Audit transaksi database (*commit & rollback*), relasi *Foreign Key*, validasi *Back-End* (skenario QA non-JavaScript), konsep OOP & DRY, serta fleksibilitas tabel API, approval, dan konfigurasi aplikasi. |
+| **`/check-db-naming`** | Memvalidasi penamaan database (`namadb` / `namadbv2`) serta awalan objek basis data (`t_`, `v_`, `fk_`, `f_`, `sp_`, `tr_`). |
+| **`/check-branch`** | Memvalidasi format nama Git branch (`<kategori>/<nama-modul>/<deskripsi-fitur>`) serta memandu 3 tahap alur kerja Git (Local, QA, Production). |
+| **`/comment`** | Menghasilkan atau memeriksa template blok komentar 3 poin wajib (Fungsi kode untuk apa, Cara Kerja singkat, Cara Penggunaan). |
+| **`/check-ui`** | Memeriksa form vertikal (1 kolom), pengelompokan informasi, letak navigasi & logo, hierarki warna & ikon tombol (Submit = Biru, Delete = Merah, Cancel = Pudar), matriks kontras warna teks vs background, server-side paging tabel, dan konsistensi 1 bahasa. |
 
 ---
 

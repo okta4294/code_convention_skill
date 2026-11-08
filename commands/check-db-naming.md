@@ -41,3 +41,8 @@ Memeriksa kepatuhan penamaan objek basis data (tabel, view, foreign key, functio
 ### 💻 Usulan Perubahan Skrip DDL / Migration (Proposed Code)
 -- Rekomendasi DDL / Query Penyesuaian
 ...
+
+---
+
+### ⚠️ Catatan Review untuk Developer
+[Dampak perubahan nama tabel/kolom/constraint terhadap query aplikasi, model ORM, serta pencadangan database sebelum migrasi]

@@ -11,29 +11,34 @@ workflow_instructions:
   - Structure all findings strictly as an "Implementation Plan".
 
 rules:
+  programming_concepts:
+    - Apply Object Oriented Programming (OOP) for clear object relationships.
+    - Enforce DRY (Don't Repeat Yourself): processes used more than once must be declared as `public` functions/procedures in a parent class that executing classes `extends`.
+    - Standard frameworks: YII, CodeIgniter, Laravel, and Golang (Gorilla Mux & GORM).
   security:
-    - Enforce prepared statements / parameterized queries or framework ORM/Query Builder to stop SQL Injection. If not feasible in legacy systems, suggest alternative mitigations (database escaping, strict numeric type casting, whitelist validation for dynamic clauses, filter/regex) and confirm with developer.
-    - Require contextual HTML escaping / encoding on any user input parameters (e.g. query params) printed to views to stop XSS.
-    - Forbid direct path file downloads via GET params (enforce document ID lookups with role verification).
-    - File uploads must validate whitelisted extensions/MIMEs and hash the saved filename.
+    - Enforce prepared statements / parameterized queries (MySQLi OO/Procedural, PDO named/positional params, or framework Query Builder/ORM) to stop SQL Injection and single-quote (`'`) parsing errors. If not feasible in legacy systems, suggest `mysqli_real_escape_string` / `addslashes`, strict numeric casting, whitelist validation, and confirm with developer.
+    - Require `htmlentities()` on any `$_GET` values printed to labels/views to stop XSS.
+    - Forbid direct filename/path file downloads via GET params (enforce document ID lookups `?id=1` with authentication & role authorization checks).
+    - File uploads must rename files using unique hashing, store the hashed filename in DB (separate hash vs display name columns if needed), and validate extensions per QMS rules.
+    - Store content access authorization in the database based on user `role`.
   data_integrity:
-    - Back-end write operations require transaction handling with rollback upon errors (e.g. PDO/Laravel/CI, Prisma, @Transactional, db.Begin).
-    - Tables must maintain explicit Foreign Keys matching `fk_<table_alias>_<column_name>`.
-    - Back-end validation is mandatory and primary; front-end JS validation is strictly secondary.
+    - Relational tables must maintain explicit Foreign Keys from ERD design (`fk_<table_alias>_<column_name>`).
+    - Back-end write operations require transaction handling with commit & rollback (e.g., CI `trans_start`/`trans_commit`/`trans_rollback`, PDO, Laravel, GORM).
+    - Back-end validation is mandatory and primary before front-end validation (QA must test with browser JavaScript disabled).
   architecture_scalability:
-    - API endpoints and approval steps must reside in database configuration tables.
-    - Dynamic data tables must implement server-side pagination.
+    - API URLs (`url`, `aplikasi`, `nama_modul`), approval workflows (`approval_action`, `approval_step`, `approval_group`, `transaksional_log`, `transaksional_approval`), and user-configurable application settings must reside in database tables.
+    - Dynamic data tables must implement server-side pagination (never use client-side jQuery DataTables plugin) and maintain high performance.
   naming_conventions:
-    - Tables: `t_<name>`
-    - Views: `v_<name>`
+    - Databases: named by function/data (`naker`), legacy versions suffixed (`namadbv2`).
+    - Tables: `t_<name>`, Views: `v_<name>`, Foreign Keys: `fk_<table_abbr>_<col_name>`
     - Routines: Functions (`f_<name>`), Procedures (`sp_<name>`), Triggers (`tr_<name>`)
-    - Git Branch: `<category>/<module-name>/<feature-desc>` (Feature, Develop, QA/Test, Release, Master, Hotfix)
+    - Git Branch: `<category>/<module-name>/<feature-desc>` using `/` and `-` (feature, develop, qa, release, master, hotfix) following the 3-stage workflow (Local -> QA -> Production).
   commenting:
-    - Every routine requires 3 mandatory points: (1) Code purpose, (2) Brief mechanism, (3) Invocation example.
+    - Every function/procedure requires a comment block above its declaration with 3 mandatory points: (1) What the code functions for, (2) How it briefly works, (3) How to use/call it.
   ui_ux:
-    - Vertical form layouts for complex input groups.
-    - Color hierarchy: Primary/Submit = Blue, Danger/Delete = Red, Secondary/Cancel = Muted/Grey.
-    - Top-left logo placement, left sidebar for desktop, top-right menu for mobile web.
+    - Multiplatform & mobile-friendly templates; vertical single-column form layouts for multi-field forms; group fields by category.
+    - Color & icon hierarchy: Submit = Blue (prominent primary position), Delete = Red (trash icon), Cancel = Muted/White/Grey, Edit = pen icon; follow the Foreground vs Background contrast matrix (4.5.6.5).
+    - Top-left logo placement, left sidebar for desktop, top-right menu for mobile web, top-left menu for mobile apps; 100% single-language consistency.
 
 response_template: |
   ### 📋 Ringkasan Audit Kepatuhan

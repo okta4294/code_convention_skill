@@ -12,32 +12,40 @@ Whenever the user asks for a review, audit, or slash command:
 ---
 
 ## Core Standards
-1. Security:
-   - Always use Parameterized Queries / Prepared Statements / ORM for database operations to prevent SQL Injection (e.g. PDO/MySQLi, Node.js/pg/Prisma, SQLAlchemy, PreparedStatement).
-     * Fallback if parameterized queries are not feasible: Suggest alternative mitigations: (1) database escaping/sanitization, (2) strict integer/numeric type casting (e.g. `(int)$id`, `parseInt`), (3) whitelist validation for dynamic clauses (e.g. ORDER BY/sorting), (4) format validation (filter/regex), and (5) ask developer confirmation between alternative sanitization vs gradual migration.
-   - User input parameters (e.g. URL query params) rendered into HTML/views must be sanitized using contextual HTML escaping / encoding (e.g. `htmlentities()`, template auto-escaping).
-   - File downloads must use document ID validation with auth/role checks (never expose raw file paths or filenames in URL parameters).
-   - Uploaded files must use unique hashed filenames and whitelist extension/MIME validation.
-2. Integrity:
-   - Back-end database write operations (insert, update, delete) MUST use database transactions with rollback upon errors (e.g. PDO/Laravel/CI transactions, Prisma `$transaction`, `@Transactional`, `db.Begin`).
-   - Relational tables must define explicit Foreign Keys starting from ERD design.
-   - Dual-layer validation is mandatory: server-side (back-end) validation takes precedence over client-side (front-end) validation.
-3. Flexibility & Scalability:
-   - Third-party/internal API URLs and approval workflows must be stored in database tables (never hardcoded).
-   - Data tables with dynamic/growing datasets must use server-side pagination (avoid client-side DOM pagination).
-4. Naming Conventions:
-   - Database tables: prefix `t_` (e.g., `t_transaksi`).
-   - Views: prefix `v_` (e.g., `v_rekap`).
-   - Foreign Keys: prefix `fk_<table_abbreviation>_<column_name>` (e.g., `fk_tio_id_invoice_online`).
-   - Functions: prefix `f_` | Stored Procedures: prefix `sp_` | Triggers: prefix `tr_`.
-   - Git Branches: `<category>/<module-name>/<description>` using kebab-case for multi-word segments (categories: feature, develop, qa, release, master, hotfix).
-5. Documentation:
-   - Every function/procedure must document: (1) Purpose, (2) Brief workflow, (3) Usage example.
-6. UI/UX:
-   - Desktop menu: left sidebar. Mobile web: top right. Mobile apps: top left. Logo: top left.
-   - Heavy-input forms must be vertical (single-column).
-   - Button colors: Submit (Blue), Delete (Red), Cancel (Muted/Grey/White).
-   - Language must be consistent throughout the view (100% Indonesian or 100% English).
+1. Programming Concepts & Frameworks (Poin 2 & 3):
+   - Object Oriented Programming (OOP) is mandatory to clarify object relationships and maintainability.
+   - DRY (Don't Repeat Yourself): Any process used more than once MUST be extracted into a `public` function/procedure in a parent class, and the executing class must extend (`extends`) that class.
+   - Standard Frameworks: PHP (YII, CodeIgniter, Laravel) and Golang (Gorilla Mux for API routing & GORM for database transactions).
+2. Security / Secured Programming (Poin 4.6):
+   - SQL Injection & Unique Character Handling (4.6.3): Always use Parameterized Queries / Prepared Statements (MySQLi Object-Oriented/Procedural, PDO named/question mark params, or framework Query Builder/ORM) to prevent SQL Injection and syntax errors from characters like single quotes (`'`).
+     * Fallback if parameterized queries are not feasible in legacy code: (1) use `mysqli_real_escape_string` / `mysql_real_escape_string` or `addslashes`, (2) strict numeric type casting (`(int)$id`), (3) whitelist validation for dynamic clauses, (4) format validation, and (5) ask developer confirmation between alternative sanitization vs gradual migration.
+   - XSS Prevention / Filtering Parsing Data (4.6.2): User input parameters (e.g., `$_GET`) rendered into HTML labels/views must be sanitized using `htmlentities()` (never print raw `$_GET` variables).
+   - File Download Method (4.6.1): File downloads must use document ID validation (e.g., `download.php?id=1` or `/download/1`) accompanied by authentication and role authorization checks. Never expose raw file paths or filenames in URL parameters (e.g., `?file=sales_report.pdf`).
+   - File Upload Naming & Extension (4.6.5): Uploaded files must be renamed using unique hashing, the hashed filename must be stored in the database (separate hash column and original filename column if display is needed), and file extensions must be validated against agreed QMS rules.
+   - Content Authorization (4.6.4): Data access authorization must be validated against user `role` stored in the database.
+3. Integrity (Poin 4.2):
+   - Foreign Keys (4.2.1): Relational tables must define explicit Foreign Keys starting from ERD design (`fk_<table_abbreviation>_<column_name>`).
+   - Commit and Rollback (4.2.2): Back-end database write operations (insert, update, delete) MUST use database transactions with commit & rollback (e.g., CodeIgniter `trans_start` / `trans_status` / `trans_commit` / `trans_rollback`, PDO, Laravel `DB::transaction`, GORM `db.Transaction`).
+   - Front-End & Back-End Validation (4.2.3): Dual-layer validation is mandatory, prioritizing Back-End validation first to anticipate users disabling JavaScript in the browser. QA scenarios must test with JavaScript disabled.
+4. Flexibility, Scalability, & Performance (Poin 4.3, 4.4, 4.7):
+   - API Calls (4.3.1): API URLs must be stored in a database table (e.g., `url`, `aplikasi`, `nama_modul`) and fetched dynamically (never hardcoded).
+   - Standard Approval (4.3.2): Approval stages and actors must be stored in database tables (`approval_action`, `approval_step`, `approval_group`, `transaksional_log`, `transaksional_approval`).
+   - Application Configuration (4.3.3): Provide configuration modules so designated user PICs can adjust application variables without code changes.
+   - Table Paging (4.4.1) & High Performance (4.7): Growing data tables must use server-side pagination (do NOT use client-side jQuery DataTables plugin); ensure fast response times for data display and storage.
+5. Naming Conventions & Git Workflow (Poin 5):
+   - Databases (5.1): Named after function/data content (e.g., `naker`); legacy migrated databases append version (`namadbv2`).
+   - Tables (5.2): prefix `t_` (e.g., `t_transaksi`). Views (5.3): prefix `v_` (e.g., `v_rekap`).
+   - Foreign Keys (5.4): prefix `fk_<table_abbreviation>_<column_name>` (e.g., `fk_tio_id_invoice_online`).
+   - Functions (5.5): prefix `f_` | Stored Procedures (5.6): prefix `sp_` | Triggers (5.7): prefix `tr_`.
+   - Git Branches (5.8): `<category>/<module-name>/<description>` using `/` as segment separator and `-` for multi-word segments (categories: `feature`, `develop`, `qa`, `release`, `master`, `hotfix`), following the 3-stage workflow (Local `feature` -> merge & push to `develop` for QA -> PR from `feature` to `master` for Production).
+6. Standard Commenting (Poin 6):
+   - Every function/procedure must include a comment block above its declaration explaining: (1) What the code functions for, (2) How it briefly works, (3) How to use/call the code.
+7. UX Friendly / UI Guidelines (Poin 4.5):
+   - Multiplatform (Chrome, Firefox, Safari, Opera, IE/Edge) & Mobile Friendly.
+   - Menu & Logo: Desktop menu on left sidebar, Mobile web on top right, Mobile apps on top left. Logo always on top left.
+   - Language & Typography: 100% single-language consistency (all Indonesian or all English) across labels, buttons, menus, placeholders, notifications, and inline error messages.
+   - Element Hierarchy: Submit button = Blue (prominent primary position), Cancel button = Muted/Faded (White/Grey), Delete button = Red. Consistent familiar icons (pen for edit, trash bin for delete).
+   - Forms & Grouping: Forms with many fields MUST be vertical (single-column). Group fields/tables by category. Ensure high-contrast Foreground vs Background color combinations per the standard color matrix (4.5.6.5).
 
 ---
 

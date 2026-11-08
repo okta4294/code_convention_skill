@@ -19,11 +19,15 @@
   Hanya pasang konfigurasi OpenCode (AGENTS.md & Commands).
 .PARAMETER All
   Pasang seluruh konfigurasi AI.
+.PARAMETER Uninstall
+  Hapus/uninstall konfigurasi aturan yang telah dipasang.
 .EXAMPLE
   .\install.ps1
   .\install.ps1 -Global
   .\install.ps1 -Cursor
   .\install.ps1 -Global -Claude
+  .\install.ps1 -Uninstall
+  .\install.ps1 -Global -Uninstall
 #>
 
 param(
@@ -34,7 +38,8 @@ param(
     [switch]$Windsurf,
     [switch]$Claude,
     [switch]$Antigravity,
-    [switch]$OpenCode
+    [switch]$OpenCode,
+    [switch]$Uninstall
 )
 
 $ErrorActionPreference = "Stop"
@@ -95,6 +100,7 @@ try {
 
     $UserHome = [Environment]::GetFolderPath("UserProfile")
     $IsGlobal = ($PSBoundParameters.ContainsKey('Global') -and $Global) -or $Global.IsPresent -or ($args -contains "-Global") -or ($args -contains "--global") -or ($args -contains "-g") -or ($env:GLOBAL -eq "1") -or ($env:GLOBAL -eq "true")
+    $IsUninstall = ($PSBoundParameters.ContainsKey('Uninstall') -and $Uninstall) -or $Uninstall.IsPresent -or ($args -contains "-Uninstall") -or ($args -contains "--uninstall") -or ($args -contains "-u")
 
     # Deteksi pilihan alat
     $DoCursor = $Cursor.IsPresent -or ($args -contains "-Cursor") -or ($args -contains "--cursor")
@@ -108,7 +114,8 @@ try {
 
     if (-not $AnyToolSelected) {
         if ([Environment]::UserInteractive -and -not [Console]::IsInputRedirected) {
-            Write-Host "Pilih AI assistant yang ingin dipasang:"
+            $actionLabel = if ($IsUninstall) { "dihapus / diuninstall" } else { "dipasang" }
+            Write-Host "Pilih AI assistant yang ingin $actionLabel`:"
             Write-Host "  [1] Semua AI (Default)"
             Write-Host "  [2] Cursor IDE (.cursorrules)"
             Write-Host "  [3] Windsurf IDE (.windsurfrules)"
@@ -132,6 +139,88 @@ try {
         }
     } elseif ($DoAll) {
         $DoCursor = $DoWindsurf = $DoClaude = $DoAntigravity = $DoOpenCode = $true
+    }
+
+    if ($IsUninstall) {
+        if ($IsGlobal) {
+            Write-Host "Menghapus konfigurasi secara global..."
+            if ($DoCursor) {
+                $p = Join-Path $UserHome ".cursorrules"
+                if (Test-Path $p) { Remove-Item -Path $p -Force; Write-Host "  -> Dihapus: $p" }
+            }
+            if ($DoWindsurf) {
+                $p = Join-Path $UserHome ".windsurfrules"
+                if (Test-Path $p) { Remove-Item -Path $p -Force; Write-Host "  -> Dihapus: $p" }
+            }
+            if ($DoClaude) {
+                $p = Join-Path $UserHome ".claude\CLAUDE.md"
+                if (Test-Path $p) { Remove-Item -Path $p -Force; Write-Host "  -> Dihapus: $p" }
+            }
+            if ($DoOpenCode) {
+                $p = Join-Path $UserHome ".config\opencode\AGENTS.md"
+                if (Test-Path $p) { Remove-Item -Path $p -Force; Write-Host "  -> Dihapus: $p" }
+                $cmdDir = Join-Path $UserHome ".config\opencode\commands"
+                $SourceCommands = Join-Path $SourceDir "commands"
+                if ((Test-Path $cmdDir) -and (Test-Path $SourceCommands)) {
+                    Get-ChildItem -Path $SourceCommands | ForEach-Object {
+                        $targetCmd = Join-Path $cmdDir $_.Name
+                        if (Test-Path $targetCmd) { Remove-Item -Path $targetCmd -Force }
+                    }
+                    Write-Host "  -> Perintah OpenCode dibersihkan dari: $cmdDir"
+                }
+            }
+            if ($DoAntigravity) {
+                $GeminiRules = Join-Path $UserHome ".gemini\config\rules\corporate-rules.md"
+                if (Test-Path $GeminiRules) { Remove-Item -Path $GeminiRules -Force; Write-Host "  -> Dihapus: $GeminiRules" }
+                $GeminiSkills = Join-Path $UserHome ".gemini\config\skills"
+                $SourceSkills = Join-Path $SourceDir "skills"
+                if ((Test-Path $GeminiSkills) -and (Test-Path $SourceSkills)) {
+                    Get-ChildItem -Path $SourceSkills -Directory | ForEach-Object {
+                        $targetSkill = Join-Path $GeminiSkills $_.Name
+                        if (Test-Path $targetSkill) { Remove-Item -Path $targetSkill -Recurse -Force }
+                    }
+                    Write-Host "  -> Skill Antigravity dibersihkan dari: $GeminiSkills"
+                }
+            }
+            Write-Host "Selesai. Aturan global berhasil dihapus."
+        } else {
+            $ResolvedTarget = Resolve-Path $TargetDir -ErrorAction SilentlyContinue
+            if (-not $ResolvedTarget) { $ResolvedTarget = $TargetDir }
+            Write-Host "Menghapus konfigurasi dari: $ResolvedTarget"
+            if ($DoCursor) {
+                $p = Join-Path $ResolvedTarget ".cursorrules"
+                if (Test-Path $p) { Remove-Item -Path $p -Force; Write-Host "  -> Dihapus: $p" }
+            }
+            if ($DoWindsurf) {
+                $p = Join-Path $ResolvedTarget ".windsurfrules"
+                if (Test-Path $p) { Remove-Item -Path $p -Force; Write-Host "  -> Dihapus: $p" }
+            }
+            if ($DoClaude) {
+                $p = Join-Path $ResolvedTarget "CLAUDE.md"
+                if (Test-Path $p) { Remove-Item -Path $p -Force; Write-Host "  -> Dihapus: $p" }
+            }
+            if ($DoOpenCode) {
+                $p = Join-Path $ResolvedTarget "AGENTS.md"
+                if (Test-Path $p) { Remove-Item -Path $p -Force; Write-Host "  -> Dihapus: $p" }
+                $pCmd = Join-Path $ResolvedTarget ".opencode\commands"
+                if (Test-Path $pCmd) { Remove-Item -Path $pCmd -Recurse -Force; Write-Host "  -> Dihapus: $pCmd" }
+            }
+            if ($DoAntigravity) {
+                $pRules = Join-Path $ResolvedTarget ".agents\rules\corporate-rules.md"
+                if (Test-Path $pRules) { Remove-Item -Path $pRules -Force; Write-Host "  -> Dihapus: $pRules" }
+                $targetSkillsDir = Join-Path $ResolvedTarget ".agents\skills"
+                $SourceSkills = Join-Path $SourceDir "skills"
+                if ((Test-Path $targetSkillsDir) -and (Test-Path $SourceSkills)) {
+                    Get-ChildItem -Path $SourceSkills -Directory | ForEach-Object {
+                        $targetSkill = Join-Path $targetSkillsDir $_.Name
+                        if (Test-Path $targetSkill) { Remove-Item -Path $targetSkill -Recurse -Force }
+                    }
+                    Write-Host "  -> Skill Antigravity dibersihkan dari: $targetSkillsDir"
+                }
+            }
+            Write-Host "Selesai. Aturan lokal berhasil dihapus."
+        }
+        return
     }
 
     if ($IsGlobal) {

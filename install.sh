@@ -30,6 +30,7 @@ USER_HOME="${HOME:-$USERPROFILE}"
 
 # Opsi dan Flag
 IS_GLOBAL=false
+IS_UNINSTALL=false
 TARGET_DIR="."
 INSTALL_CURSOR=false
 INSTALL_WINDSURF=false
@@ -42,6 +43,9 @@ for arg in "$@"; do
   case "$arg" in
     --global|-g)
       IS_GLOBAL=true
+      ;;
+    --uninstall|-u)
+      IS_UNINSTALL=true
       ;;
     --cursor)
       INSTALL_CURSOR=true
@@ -119,6 +123,55 @@ if [ "$TOOL_SPECIFIED" = false ]; then
     INSTALL_ANTIGRAVITY=true
     INSTALL_OPENCODE=true
   fi
+fi
+
+if [ "$IS_UNINSTALL" = true ]; then
+  if [ "$IS_GLOBAL" = true ]; then
+    echo "Menghapus aturan secara global..."
+    [ "$INSTALL_CURSOR" = true ] && rm -f "${USER_HOME}/.cursorrules" && echo "  -> Dihapus: ${USER_HOME}/.cursorrules"
+    [ "$INSTALL_WINDSURF" = true ] && rm -f "${USER_HOME}/.windsurfrules" && echo "  -> Dihapus: ${USER_HOME}/.windsurfrules"
+    [ "$INSTALL_CLAUDE" = true ] && rm -f "${USER_HOME}/.claude/CLAUDE.md" && echo "  -> Dihapus: ${USER_HOME}/.claude/CLAUDE.md"
+    if [ "$INSTALL_OPENCODE" = true ]; then
+      rm -f "${USER_HOME}/.config/opencode/AGENTS.md"
+      if [ -d "$SOURCE_DIR/commands" ]; then
+        for f in "$SOURCE_DIR/commands"/*; do
+          [ -e "$f" ] && rm -f "${USER_HOME}/.config/opencode/commands/$(basename "$f")"
+        done
+      fi
+      echo "  -> OpenCode dibersihkan dari: ${USER_HOME}/.config/opencode"
+    fi
+    if [ "$INSTALL_ANTIGRAVITY" = true ]; then
+      rm -f "${USER_HOME}/.gemini/config/rules/corporate-rules.md"
+      if [ -d "$SOURCE_DIR/skills" ]; then
+        for d in "$SOURCE_DIR/skills"/*; do
+          [ -d "$d" ] && rm -rf "${USER_HOME}/.gemini/config/skills/$(basename "$d")"
+        done
+      fi
+      echo "  -> Antigravity dibersihkan dari: ${USER_HOME}/.gemini/config"
+    fi
+    echo "Selesai. Aturan global berhasil dihapus (uninstalled)."
+  else
+    echo "Menghapus aturan dari: $TARGET_DIR"
+    [ "$INSTALL_CURSOR" = true ] && rm -f "$TARGET_DIR/.cursorrules" && echo "  -> Dihapus: $TARGET_DIR/.cursorrules"
+    [ "$INSTALL_WINDSURF" = true ] && rm -f "$TARGET_DIR/.windsurfrules" && echo "  -> Dihapus: $TARGET_DIR/.windsurfrules"
+    [ "$INSTALL_CLAUDE" = true ] && rm -f "$TARGET_DIR/CLAUDE.md" && echo "  -> Dihapus: $TARGET_DIR/CLAUDE.md"
+    if [ "$INSTALL_OPENCODE" = true ]; then
+      rm -f "$TARGET_DIR/AGENTS.md"
+      rm -rf "$TARGET_DIR/.opencode/commands"
+      echo "  -> Dihapus: $TARGET_DIR/AGENTS.md & $TARGET_DIR/.opencode/commands"
+    fi
+    if [ "$INSTALL_ANTIGRAVITY" = true ]; then
+      rm -f "$TARGET_DIR/.agents/rules/corporate-rules.md"
+      if [ -d "$SOURCE_DIR/skills" ]; then
+        for d in "$SOURCE_DIR/skills"/*; do
+          [ -d "$d" ] && rm -rf "$TARGET_DIR/.agents/skills/$(basename "$d")"
+        done
+      fi
+      echo "  -> Antigravity dibersihkan dari: $TARGET_DIR/.agents"
+    fi
+    echo "Selesai. Aturan lokal berhasil dihapus (uninstalled)."
+  fi
+  exit 0
 fi
 
 if [ "$IS_GLOBAL" = true ]; then

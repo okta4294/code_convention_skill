@@ -6,39 +6,48 @@ MODE OPERASIONAL: ADVISORY ONLY (Read-Only). Anda TIDAK DIPERBOLEHKAN mengubah a
 STANDAR TEKNIS YANG WAJIB DITEGAKKAN:
 ==================================================
 
-1. PEMROGRAMAN AMAN (SECURITY):
-- SQL Injection: Dilarang menggabungkan variabel langsung ke dalam raw query. Wajib menggunakan Parameterized Query / Prepared Statements / ORM resmi (contoh: PDO/MySQLi, Node.js/Prisma/pg, SQLAlchemy, PreparedStatement). Jika arsitektur aplikasi belum memungkinkan parameterized query, AI wajib menyarankan mitigasi alternatif: (1) escaping bawaan driver basis data, (2) strict type casting numerik (misal int/parseInt), (3) whitelist array/set validation untuk klausa dinamis seperti ORDER BY, (4) format validation (filter/regex), dan (5) konfirmasi opsi developer.
-- XSS Prevention: Parameter input pengguna (misal URL query params) yang dicetak ke HTML wajib disanitasi dengan fungsi encoding/escaping HTML kontekstual (misal htmlentities(), auto-escaping template engine).
-- File Download: Wajib berbasis ID dokumen yang terdaftar disertai pengecekan hak akses (otorisasi/role). Dilarang mengekspos path berkas langsung atau parameter nama file di URL.
-- File Upload: Nama berkas wajib diubah menjadi hash unik dan divalidasi dengan whitelist ekstensi serta MIME type yang diizinkan.
+1. KONSEP & FRAMEWORK PEMROGRAMAN (POIN 2 & 3):
+- Object Oriented Programming (OOP): Wajib digunakan untuk mempermudah pemahaman relasi objek dan keberlanjutan pengembangan.
+- DRY (Don't Repeat Yourself): Proses yang digunakan lebih dari satu kali wajib dibuatkan fungsi dan prosedur yang dideklarasikan secara `public`, kemudian class pelaksana dinyatakan sebagai perpanjangan (`extends`) dari class tersebut.
+- Standar Framework: PHP (YII, CodeIgniter, Laravel) dan Golang (Gorilla Mux untuk API & GORM untuk transaksi database).
 
-2. INTEGRITAS & VALIDASI (INTEGRITY):
-- Transaksi Database: Setiap proses penulisan data di sisi back end (insert/update/delete) wajib dibungkus blok transaksi dengan penanganan rollback saat error (contoh: PDO/Laravel/CI, Prisma, @Transactional, db.Begin).
-- Foreign Key: Wajib mendefinisikan Foreign Key untuk setiap relasi tabel sejak fase ERD.
-- Validasi Berlapis: Validasi Back End wajib ada dan diutamakan sebelum Front End (mengantisipasi jika JavaScript dinonaktifkan).
+2. PEMROGRAMAN AMAN / SECURED PROGRAMMING (POIN 4.6):
+- SQL Injection & Karakter Unik (4.6.3): Dilarang menggabungkan variabel langsung ke dalam raw query (terutama input yang memiliki karakter unik seperti petik `'`). Wajib menggunakan Parameterized Query / Prepared Statements (MySQLi Object-Oriented/Procedural, PDO named `:param` atau question mark `?`, atau Query Builder/ORM framework). Jika arsitektur legasi belum memungkinkan parameterized query, AI wajib menyarankan mitigasi: (1) fungsi escaping `mysqli_real_escape_string` / `addslashes`, (2) strict type casting numerik (`(int)$id`), (3) whitelist validation untuk klausa dinamis, (4) format validation, dan (5) konfirmasi opsi developer.
+- Filtering Parsing Data / XSS Prevention (4.6.2): Variabel dari parsing data `$_GET` yang dicetak ke label/HTML wajib disanitasi dengan fungsi `htmlentities()`.
+- Metode Download File (4.6.1): Wajib berbasis ID dokumen yang disimpan (contoh: `download.php?id=1` atau `/download/1`) disertai pengecekan autentikasi dan otorisasi akses pengguna. Dilarang mengekspos path berkas langsung atau parameter nama file di URL (`?file=sales_report.pdf`).
+- Penamaan & Ekstensi Upload File (4.6.5): Nama berkas yang diunggah wajib di-rename menggunakan hashing unik, nama hasil hash disimpan di kolom database (pisahkan kolom nama hash sistem dan kolom nama asli jika perlu ditampilkan ke UI), serta divalidasi ekstensinya sesuai standar QMS.
+- Otorisasi Konten (4.6.4): Otorisasi hak akses konten data wajib disimpan di database dalam bentuk `role`.
 
-3. ARSITEKTUR & SKALABILITAS:
-- URL API & Approval Workflow: Endpoint API dan urutan persetujuan wajib disimpan di database (tidak boleh hardcoded).
-- Paging Tabel: Tampilan data bervolume dinamis wajib menggunakan server-side pagination.
+3. INTEGRITAS & VALIDASI (POIN 4.2):
+- Foreign Key (4.2.1): Wajib menggunakan Foreign Key pada relasi antar tabel sejak desain ERD (`fk_<singkatan_tabel>_<nama_kolom>`).
+- Commit and Rollback (4.2.2): Setiap proses penyimpanan data di sisi back end (insert/update/delete) wajib menggunakan sistem transaksi commit dan rollback (contoh: CodeIgniter `trans_start` / `trans_status` / `trans_commit` / `trans_rollback`, PDO, Laravel `DB::transaction`, GORM `db.Transaction`).
+- Validasi Front End & Back End (4.2.3): Validasi wajib di dua sisi dengan mengutamakan Back End terlebih dahulu sebelum Front End (mengantisipasi user mematikan JavaScript di browser; pengujian QA wajib diskenariokan dengan mematikan JavaScript).
 
-4. STANDAR PENAMAAN (NAMING CONVENTION):
-- Tabel: Awalan "t_" (contoh: t_transaksi)
-- View: Awalan "v_" (contoh: v_rekap)
-- Foreign Key: Awalan "fk_<singkatan_tabel>_<nama_kolom>" (contoh: fk_tio_id_invoice_online)
-- Function: Awalan "f_", Procedure: Awalan "sp_", Trigger: Awalan "tr_"
-- Git Branch: "<kategori>/<nama-modul>/<deskripsi-fitur>" dengan pemisah kata tanda hubung "-" (kategori: feature, develop, qa, release, master, hotfix).
+4. FLEKSIBILITAS, SKALABILITAS, & PERFORMA (POIN 4.3, 4.4, 4.7):
+- Pemanggilan API (4.3.1): Link URL API wajib disimpan di tabel database (kolom `url`, `aplikasi`, `nama_modul`) dan diambil via fungsi helper sebelum dieksekusi (tidak boleh hardcoded).
+- Standard Approval (4.3.2): Tahapan dan pelaku approval wajib disimpan di tabel database (`approval_action`, `approval_step`, `approval_group`, `transaksional_log`, `transaksional_approval`).
+- Setting Konfigurasi Aplikasi (4.3.3): Sediakan modul konfigurasi agar perubahan variabel aplikasi dapat langsung diatur oleh PIC user.
+- Paging Tabel (4.4.1) & High Performance (4.7): Tampilan tabel dengan data yang terus bertambah wajib menggunakan server-side paging (dilarang menggunakan plugin jQuery DataTables client-side) dengan waktu respon cepat.
 
-5. DOKUMENTASI (COMMENTING):
-Setiap fungsi/prosedur wajib memiliki blok komentar berisi 3 hal:
-1. Fungsi: Kode berfungsi untuk apa.
-2. Cara Kerja: Alur kerja singkat.
-3. Cara Penggunaan: Contoh pemanggilan kode.
+5. STANDAR PENAMAAN & ALUR GIT (POIN 5):
+- Database (5.1): Sesuai nama fungsi/isi data (`naker`), versi migrasi lama diberi akhiran `namadbv2`, dst.
+- Tabel (5.2): Awalan "t_" (contoh: t_transaksi). View (5.3): Awalan "v_" (contoh: v_rekap).
+- Foreign Key (5.4): Awalan "fk_<singkatan_tabel>_<nama_kolom>" (contoh: fk_tio_id_invoice_online).
+- Function (5.5): Awalan "f_", Procedure (5.6): Awalan "sp_", Trigger (5.7): Awalan "tr_".
+- Git Branch (5.8): "<kategori>/<nama-modul>/<deskripsi-fitur>" dengan pemisah "/" dan tanda hubung "-" untuk kata majemuk (kategori: feature, develop, qa, release, master, hotfix), mengikuti 3 tahap alur Git (Local feature -> merge & push develop untuk QA -> PR dari feature ke master untuk Production).
 
-6. UI/UX GUIDELINES:
-- Form dengan banyak field wajib disusun vertikal (satu kolom ke bawah).
-- Pewarnaan Tombol: Submit (Biru), Delete (Merah), Cancel (Pudar/Abu-abu/Putih).
+6. STANDAR KOMENTAR / COMMENTING (POIN 6):
+Setiap fungsi/prosedur wajib memiliki blok komentar di atas deklarasinya yang menjelaskan 3 hal:
+1. Fungsi: Kode ini berfungsi untuk apa?
+2. Cara Kerja: Bagaimana kode ini secara singkat melakukan fungsinya?
+3. Cara Penggunaan: Bagaimana menggunakan kode tersebut?
+
+7. UX FRIENDLY / UI GUIDELINES (POIN 4.5):
+- Multiplatform (Chrome, Mozilla, Safari, Opera, IE/Edge) dan Mobile Friendly.
 - Navigasi & Logo: Desktop sidebar kiri, mobile web kanan atas, mobile apps kiri atas, logo pojok kiri atas.
-- Konsistensi bahasa seragam 100% (Indonesia semua atau Inggris semua).
+- Bahasa & Tipografi: Konsistensi bahasa seragam 100% (Indonesia semua atau Inggris semua) pada label, button, menu, placeholder, notifikasi, dan inline error message.
+- Hierarki Elemen & Form: Tombol Submit (Biru, posisi lebih menonjol), Delete (Merah, ikon tempat sampah), Cancel (Pudar/Putih/Abu-abu), Edit (ikon pena). Form dengan banyak field wajib disusun vertikal (1 kolom ke bawah) dan informasi dikelompokkan sesuai kategorinya.
+- Pewarnaan (4.5.6.5): Kombinasi warna teks (Foreground) dan Background wajib kontras (Good) dan menghindari kombinasi buram (Poor) sesuai matriks standar warna.
 
 ==================================================
 FORMAT OUTPUT WAJIB (IMPLEMENTATION PLAN):
