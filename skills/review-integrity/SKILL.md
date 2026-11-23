@@ -1,18 +1,31 @@
 ---
 name: review-integrity
-description: Melakukan audit terhadap integritas data, konsep OOP & DRY, transaksi basis data (commit/rollback), relasi Foreign Key, validasi berlapis Back End & Front End (skenario QA non-JS), serta fleksibilitas tabel API & approval. Trigger dengan /review-integrity.
+description: Use when auditing data integrity, OOP/DRY, transactions, and Foreign Keys (/review-integrity). Do NOT use for UI or XSS.
+metadata:
+  author: okta4294
+  tags:
+    - data-integrity
+    - database-transactions
+    - oop-dry
+    - code-convention
 ---
 
 # Command: /review-integrity
 
-## Deskripsi
+## Purpose
 Melakukan audit terhadap integritas data (Poin 4.2), konsep pemrograman OOP & DRY (Poin 2.1 & 2.2), serta fleksibilitas konfigurasi database (Poin 4.3).
 
-## Mode Operasional
-- ADVISORY ONLY (Read-Only).
-- Fokus pada pencegahan data korup (inconsistent data), duplikasi logika kode, dan bypass validasi front-end.
+## Prerequisites
+- Pengguna menyediakan kode controller, model, service, atau skema migrasi database yang akan diperiksa.
+- Tidak memerlukan koneksi database aktif atau API key.
 
-## Aturan Kepatuhan Khusus
+## Instructions
+
+### Mode Operasional
+- ADVISORY ONLY (Read-Only).
+- Fokus pada pencegahan data korup (inconsistent data), duplikasi logika kode, dan bypass validasi front-end tanpa mengubah file secara langsung.
+
+### Aturan Kepatuhan Khusus
 1. Database Foreign Key (Poin 4.2.1):
    - Aplikasi wajib menggunakan Foreign Key apabila melibatkan relasi antara dua tabel yang saling berhubungan.
    - Pembuatan Foreign Key wajib dilakukan sejak desain ERD dengan standar penamaan `fk_<singkatan_tabel>_<nama_kolom>` (contoh: `fk_tio_id_invoice_online`).
@@ -44,33 +57,74 @@ Melakukan audit terhadap integritas data (Poin 4.2), konsep pemrograman OOP & DR
    - **Standard Approval (4.3.2):** Tahapan dan pelaku approval wajib disimpan di dalam tabel database (`approval_action`, `approval_step`, `approval_group`, `transaksional_log`, `transaksional_approval`).
    - **Setting Konfigurasi Aplikasi (4.3.3):** Sediakan modul konfigurasi aplikasi agar perubahan variabel operasional dapat langsung dikerjakan oleh PIC user tanpa perlu intervensi kode oleh tim IT.
 
-## Format Output Wajib
-### 📋 Ringkasan Audit Kepatuhan: Integritas & Arsitektur
+### Format Output Wajib
+#### Ringkasan Audit Kepatuhan: Integritas & Arsitektur
 - Status: [Integritas Terjaga / Celah Transaksi & Validasi Ditemukan]
 - Komponen: [Fungsi Controller / Model / Skema Migration]
 
 ---
 
-### 🔍 Temuan Masalah Integritas
+#### Temuan Masalah Integritas
 [Identifikasi ketiadaan commit/rollback, ketiadaan foreign key, validasi yang hanya di front-end, duplikasi kode (pelanggaran DRY), atau URL API/approval yang di-hardcode]
 
 ---
 
-### 🛠️ Implementation Plan
+#### Implementation Plan
 1. Langkah 1: [Bungkus logika penyimpanan dalam database transaction commit & rollback]
 2. Langkah 2: [Tambahkan validasi Back End menyeluruh (tahan uji saat JavaScript dimatikan)]
 3. Langkah 3: [Definisikan Foreign Key / ekstrak fungsi public OOP (DRY) / pindahkan URL API & approval ke tabel]
 
 ---
 
-### 💻 Usulan Perubahan Kode (Proposed Code)
+#### Usulan Perubahan Kode (Proposed Code)
+```php
 // Sebelum:
-...
-
 // Sesudah (Dengan Transaksi, Validasi Back End, & Standar Konvensi):
-...
+```
 
 ---
 
-### ⚠️ Catatan Review untuk Developer
+#### Catatan Review untuk Developer
 [Skenario pengujian QA dengan mematikan JavaScript di browser, pengecekan isolasi transaksi, dan relasi Foreign Key]
+
+## Examples
+
+### Membungkus Proses Simpan dengan Transaksi & Validasi Back End
+Input pengguna:
+```php
+public function updateStok($id, $qty) {
+    $this->db->update('t_stok', ['qty' => $qty], ['id' => $id]);
+    $this->db->insert('t_log_stok', ['stok_id' => $id, 'qty' => $qty]);
+}
+```
+
+Usulan perbaikan sesuai konvensi:
+```php
+public function updateStok($id, $qty) {
+    if (!is_numeric($id) || !is_numeric($qty) || $qty < 0) {
+        return false;
+    }
+    $this->db->trans_start();
+    $this->db->trans_strict(FALSE);
+    $this->db->update('t_stok', ['qty' => (int)$qty], ['id' => (int)$id]);
+    $this->db->insert('t_log_stok', ['stok_id' => (int)$id, 'qty' => (int)$qty]);
+    if ($this->db->trans_status() === TRUE) {
+        $this->db->trans_commit();
+        return true;
+    }
+    $this->db->trans_rollback();
+    return false;
+}
+```
+
+## Limitations
+- Bersifat Read-Only (Advisory Only) dan tidak mengeksekusi perubahan kode maupun migrasi database.
+- Tidak mencakup audit keamanan SQL Injection/XSS secara mendalam (gunakan `/review-security`) atau audit tampilan UI (gunakan `/check-ui`).
+
+## Troubleshooting
+- **Error:** Engine tabel database tidak mendukung transaksi atau Foreign Key (misal MyISAM).
+  - **Cause:** Tabel lama belum menggunakan storage engine transaksional seperti InnoDB.
+  - **Solution:** Catat prasyarat migrasi engine ke InnoDB pada bagian Catatan Review sebelum menerapkan transaksi dan Foreign Key.
+- **Error:** Validasi Front End tidak terlihat di file backend yang dikirim.
+  - **Cause:** Pengguna hanya melampirkan kode controller/model tanpa file view.
+  - **Solution:** Audit validasi Back End terlebih dahulu sebagai prioritas utama, lalu ingatkan developer untuk menyinkronkan validasi Front End dan menguji skenario QA non-JS.

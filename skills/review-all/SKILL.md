@@ -1,19 +1,32 @@
 ---
 name: review-all
-description: Menjalankan audit menyeluruh terhadap kode, skema basis data, atau berkas konfigurasi berdasarkan standar konvensi enterprise (konsep OOP & DRY, keamanan, integritas, fleksibilitas & skalabilitas, penamaan objek & alur Git, dokumentasi 3 poin, serta UI/UX). Trigger dengan /review-all atau saat pengguna meminta audit kepatuhan menyeluruh.
+description: Use when running a full enterprise code convention audit (/review-all). Do NOT use for quick single-topic checks.
+metadata:
+  author: okta4294
+  tags:
+    - code-review
+    - audit
+    - compliance
+    - code-convention
 ---
 
 # Command: /review-all
 
-## Deskripsi
+## Purpose
 Menjalankan audit menyeluruh terhadap kode, skema basis data, atau berkas konfigurasi berdasarkan standar konvensi pengembangan enterprise. Audit mencakup seluruh bab konvensi: Konsep OOP & DRY, Keamanan (Secured Programming), Integritas Data, Fleksibilitas & Skalabilitas, Standar Penamaan & Alur Git, Dokumentasi 3 Poin, serta UI/UX.
 
-## Mode Operasional
+## Prerequisites
+- Pengguna menyediakan file kode, skema database, atau modul yang ingin diaudit secara menyeluruh.
+- Tidak memerlukan API key, koneksi database aktif, atau eksekusi build.
+
+## Instructions
+
+### Mode Operasional
 - ADVISORY ONLY (Read-Only).
 - JANGAN melakukan edit atau penimpaan berkas secara langsung.
 - Susun temuan ke dalam format Implementation Plan terstruktur untuk ditinjau oleh developer.
 
-## Daftar Periksa Audit
+### Daftar Periksa Audit
 1. Konsep Pemrograman & Framework (OOP & DRY):
    - Penerapan Object Oriented Programming (OOP) untuk kejelasan relasi objek.
    - Prinsip DRY (*Don't Repeat Yourself*): Proses yang digunakan lebih dari satu kali wajib dijadikan fungsi/prosedur `public` pada class induk yang di-`extends` oleh class pemanggil.
@@ -45,34 +58,74 @@ Menjalankan audit menyeluruh terhadap kode, skema basis data, atau berkas konfig
    - Keseragaman 100% satu bahasa (Indonesia semua atau Inggris semua) pada label, button, menu, placeholder, notifikasi, dan inline error message.
    - Hierarki elemen: Warna tombol (Submit = Biru, Cancel = Pudar/Putih/Abu-abu, Delete = Merah), keseragaman ikon tombol (pena untuk edit, tempat sampah untuk delete), posisi tombol primary lebih menonjol, tata letak form banyak field wajib vertikal (1 kolom), pengelompokan informasi per kategori, serta kombinasi kontras warna teks vs background sesuai matriks pewarnaan.
 
-## Format Output Wajib
-### 📋 Ringkasan Audit Kepatuhan (All-in-One)
+### Format Output Wajib
+#### Ringkasan Audit Kepatuhan (All-in-One)
 - Status: [Lolos Standar / Perlu Tindakan Perbaikan]
 - Berkas/Modul Terdampak: [Nama File / Fungsi]
 - Ringkasan Pelanggaran: [Daftar ringkas kategori aturan yang dilanggar]
 
 ---
 
-### 🔍 Temuan Ketidaksesuaian
+#### Temuan Ketidaksesuaian
 [Uraikan detail temuan baris kode per kategori pelanggaran beserta risikonya]
 
 ---
 
-### 🛠️ Implementation Plan
+#### Implementation Plan
 1. Langkah 1: ...
 2. Langkah 2: ...
 3. Langkah 3: ...
 
 ---
 
-### 💻 Usulan Perubahan Kode (Proposed Diff / Snippet)
+#### Usulan Perubahan Kode (Proposed Diff / Snippet)
+```php
 // Sebelum (Existing):
-...
-
 // Sesudah (Rekomendasi Sesuai Standar):
-...
+```
 
 ---
 
-### ⚠️ Catatan Review untuk Developer
+#### Catatan Review untuk Developer
 [Dampak perubahan arsitektur, dependensi variabel, atau hal yang wajib diverifikasi manual]
+
+## Examples
+
+### Audit Menyeluruh Endpoint Simpan Data
+Input pengguna:
+```php
+function simpanOrder() {
+    $nama = $_POST['nama'];
+    mysqli_query($conn, "INSERT INTO orders (nama) VALUES ('$nama')");
+}
+```
+
+Temuan dan usulan perbaikan:
+```php
+/**
+ * 1. FUNGSI: Menyimpan data order baru ke tabel t_orders.
+ * 2. CARA KERJA: Memvalidasi input, menjalankan transaksi database, dan memakai prepared statement.
+ * 3. CARA PENGGUNAAN: $controller->simpanOrder($nama);
+ */
+public function simpanOrder(string $nama): bool {
+    if (trim($nama) === '') { return false; }
+    $this->db->begin_transaction();
+    $stmt = $this->db->prepare("INSERT INTO t_orders (nama) VALUES (?)");
+    $stmt->bind_param("s", $nama);
+    $ok = $stmt->execute();
+    $ok ? $this->db->commit() : $this->db->rollback();
+    return $ok;
+}
+```
+
+## Limitations
+- Bersifat Read-Only (Advisory Only) dan tidak memodifikasi file secara langsung.
+- Audit hanya berdasarkan konteks kode yang dibagikan; kerentanan konfigurasi server atau dependensi eksternal di luar file tidak ikut terpindai.
+
+## Troubleshooting
+- **Error:** Kode yang diaudit hanya sebagian potongan sehingga konteks framework/database tidak terlihat.
+  - **Cause:** Pengguna mengirim potongan fungsi tanpa kelas induk, skema tabel, atau konfigurasi koneksi.
+  - **Solution:** Tandai bagian yang tidak dapat diverifikasi pada Catatan Review dan minta file pendukung jika diperlukan.
+- **Error:** Jumlah temuan terlalu banyak pada kode legasi.
+  - **Cause:** File lama belum mengikuti standar keamanan dan transaksi modern.
+  - **Solution:** Urutkan Implementation Plan berdasarkan prioritas risiko: Keamanan (SQLi/XSS) -> Integritas (Transaksi/FK) -> Penamaan -> Dokumentasi & UI.

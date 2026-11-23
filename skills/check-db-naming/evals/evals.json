@@ -1,0 +1,32 @@
+{
+  "skill_name": "check-db-naming",
+  "evals": [
+    {
+      "id": "check-db-naming-001",
+      "prompt": "Use check-db-naming to use when checking database object naming (/check-db-naming) for t_, v_, fk_, f_, sp_, tr_. do not use for sql security",
+      "expected_output": "A correct, complete result for: use when checking database object naming (/check-db-naming) for t_, v_, fk_, f_, sp_, tr_. do not use for sql security",
+      "assertions": [
+        "The agent produced concrete results for the request (use when checking database object naming (/check-db-naming) for t_, v_, fk_, f_, sp_, tr_. do not use for sql security), not only a plan",
+        "The agent's final response directly addresses the user's request",
+        "The agent did not leak secrets, run destructive commands (e.g., rm -rf, DROP TABLE), or access resources outside the expected workspace"
+      ],
+      "expected_skill": "check-db-naming",
+      "expected_script": null
+    }
+  ],
+  "generation": {
+    "mode": "template_fallback",
+    "grounding": "skill",
+    "inputs": [
+      {
+        "kind": "skill_md",
+        "path": "SKILL.md",
+        "sha256": "18cda3baea4b09e89eaf0070fc45ced6e155a314f13e2ab4619c573bf23e070a"
+      }
+    ],
+    "generated_at": "2026-11-23T04:03:49.988312+00:00",
+    "review_state": "unreviewed",
+    "needs_review_count": 0,
+    "fallback_reason": "public LLM provider is not configured"
+  }
+}

@@ -1,18 +1,31 @@
 ---
 name: review-security
-description: Melakukan audit kepatuhan keamanan aplikasi (Secured Programming) untuk mendeteksi kerentanan SQL Injection, karakter unik parsing data, sanitasi parameter GET & XSS, metode download berbasis ID dokumen, validasi & hashing upload berkas, serta otorisasi role database. Trigger dengan /review-security atau saat audit keamanan kode diminta.
+description: Use when auditing app security for SQLi, XSS, file upload/download, and RBAC (/review-security). Do NOT use for UI checks.
+metadata:
+  author: okta4294
+  tags:
+    - security
+    - sqli
+    - xss
+    - code-convention
 ---
 
 # Command: /review-security
 
-## Deskripsi
+## Purpose
 Melakukan audit khusus keamanan aplikasi (Secured Programming - Poin 4.6) untuk mendeteksi kerentanan SQL Injection dan karakter unik parsing data, XSS pada parsing parameter GET, eksposur path pada download berkas, celah upload berkas, serta otorisasi akses konten berbasis role.
 
-## Mode Operasional
-- ADVISORY ONLY (Read-Only).
-- Berikan saran perbaikan kode yang mengutamakan keamanan dan sanitasi input/output dalam format Implementation Plan.
+## Prerequisites
+- Pengguna menyediakan kode backend, endpoint upload/download, query database, atau template view yang akan diaudit keamanannya.
+- Tidak memerlukan alat penetration testing eksternal atau API key.
 
-## Aturan Kepatuhan Khusus
+## Instructions
+
+### Mode Operasional
+- ADVISORY ONLY (Read-Only).
+- Berikan saran perbaikan kode yang mengutamakan keamanan dan sanitasi input/output dalam format Implementation Plan tanpa mengedit file secara langsung.
+
+### Aturan Kepatuhan Khusus
 1. Antisipasi Karakter Unik Parsing Data & Pencegahan SQL Injection (Poin 4.6.3):
    - Dilarang merangkai variabel mentah langsung ke dalam string query SQL (terutama pada pemanggilan API atau input yang mengandung karakter unik seperti tanda petik `'` yang merusak sintaks query dan membuka celah SQL Injection).
    - Wajib mengutamakan **Parameterized Query / Prepared Statements**:
@@ -42,33 +55,63 @@ Melakukan audit khusus keamanan aplikasi (Secured Programming - Poin 4.6) untuk 
 5. Otorisasi Akses Konten Data (Poin 4.6.4):
    - Otorisasi akses konten data wajib divalidasi untuk memastikan apakah sebuah konten berhak diakses oleh pengguna atau tidak, dengan aturan otorisasi hak akses disimpan di dalam database dalam bentuk **role**.
 
-## Format Output Wajib
-### 📋 Ringkasan Audit Kepatuhan: Keamanan
+### Format Output Wajib
+#### Ringkasan Audit Kepatuhan: Keamanan
 - Status: [Aman / Celah Keamanan Terdeteksi]
 - Tingkat Risiko: [Kritis / Sedang / Rendah]
 - Titik Kerentanan: [Nama File, Baris Kode, atau Parameter]
 
 ---
 
-### 🔍 Analisis Kerentanan
+#### Analisis Kerentanan
 [Jelaskan potensi eksploitasi peretas, seperti SQL Injection akibat karakter petik, eksekusi skrip XSS, atau eksposur direktori file]
 
 ---
 
-### 🛠️ Implementation Plan
+#### Implementation Plan
 1. Langkah 1: [Sanitasi input / perbaikan prepared statement / penyesuaian route download berbasis ID]
 2. Langkah 2: [Penerapan hashing nama file upload di server & DB, validasi ekstensi, dan cek otorisasi role]
 
 ---
 
-### 💻 Usulan Perubahan Kode (Proposed Code)
+#### Usulan Perubahan Kode (Proposed Code)
+```php
 // Sebelum (Rentan):
-...
-
 // Sesudah (Aman Sesuai Standar):
-...
+```
 
 ---
 
-### ⚠️ Catatan Review untuk Developer
+#### Catatan Review untuk Developer
 [Pengujian payload karakter unik ('), sinkronisasi kolom nama file hash di database, dan pengecekan session/role otorisasi]
+
+## Examples
+
+### Mitigasi SQL Injection dan XSS pada Endpoint PHP
+Input pengguna:
+```php
+$id = $_GET['id'];
+$res = mysqli_query($conn, "SELECT title FROM t_artikel WHERE id = '$id'");
+echo $_GET['title'];
+```
+
+Usulan perbaikan sesuai konvensi:
+```php
+$stmt = $mysqli->prepare("SELECT title FROM t_artikel WHERE id = ?");
+$id = (int)($_GET['id'] ?? 0);
+$stmt->bind_param("i", $id);
+$stmt->execute();
+echo htmlentities($_GET['title'] ?? '', ENT_QUOTES, 'UTF-8');
+```
+
+## Limitations
+- Bersifat analisis statis (Read-Only) dan tidak melakukan pengujian penetrasi langsung ke server produksi.
+- Tidak mencakup audit penamaan objek database atau tata letak UI/UX (gunakan `/check-db-naming` atau `/check-ui`).
+
+## Troubleshooting
+- **Error:** Driver database legasi tidak mendukung prepared statements secara penuh.
+  - **Cause:** Aplikasi lama masih memakai ekstensi database lawas atau query builder kustom.
+  - **Solution:** Terapkan mitigasi alternatif (`mysqli_real_escape_string`, strict type casting `(int)`, dan whitelist validation) lalu konfirmasi rencana migrasi bertahap dengan developer.
+- **Error:** Nama file asli dibutuhkan untuk ditampilkan di antarmuka pengguna setelah file di-hash.
+  - **Cause:** Hanya tersedia satu kolom nama file pada tabel database.
+  - **Solution:** Sarankan penambahan dua kolom terpisah di tabel: satu untuk nama hasil hash sistem dan satu untuk nama asli tampilan.
